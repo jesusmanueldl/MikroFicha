@@ -1343,7 +1343,7 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
 
         //POSXI Y POSYI posiciones iniciales de l ficha
         int anchoFicha = ancho_diseno, altoFicha = alto_diseno;//medidas de las fichas en CM
-        float NFICHAS = TOTAL_FICHA; //nuero de fichas para imprimir----
+        float NFICHAS = lista_fichas_pdf.size(); //nuero de fichas para imprimir----
         int espacio = ESPACIADO;
         //#################################
 
@@ -2089,6 +2089,19 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
         protected void onPostExecute(Void unused) {
             progress.dismiss();
             if(!ticket) {
+                int generadas = lista_fichas_pdf.size();
+                Log.d("FICHAS", "Se generaron " + generadas + " fichas (pedido: " + TOTAL_FICHA + ")");
+
+                // Podrías mostrar un Toast
+                if (generadas == 0) {
+                    Toast.makeText(Admin.this, "No se generó ninguna ficha. Verifique conexión.", Toast.LENGTH_LONG).show();
+                    return;
+                } else if (generadas < TOTAL_FICHA) {
+                    Toast.makeText(Admin.this,
+                            "Se generaron solo " + generadas + " fichas de las " + TOTAL_FICHA + " solicitadas.",
+                            Toast.LENGTH_LONG).show();
+                }
+
                 generarPDF();
                 dialog.dismiss();
             }

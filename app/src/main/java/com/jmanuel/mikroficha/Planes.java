@@ -884,8 +884,7 @@ public class Planes extends AppCompatActivity implements PopupMenu.OnMenuItemCli
                 if (con.isConnected()) {
                     List<Map<String, String>> rs;
 
-                    rs = con.execute("/ip/hotspot/user/profile/add name="+value[0]+
-                            " shared-users="+value[1].toString()+" rate-limit="+value[2].toString()+
+                    rs = con.execute("/ip/hotspot/user/profile/add name="+value[0]+ " shared-users="+value[1].toString()+" rate-limit="+value[2].toString()+
                             " session-timeout="+value[3].toString()+" idle-timeout="+value[4].toString()+" transparent-proxy=yes");
 
                   /*  rs = con.execute("/system/scheduler/print");
@@ -900,7 +899,7 @@ public class Planes extends AppCompatActivity implements PopupMenu.OnMenuItemCli
                     }
                     if(!ya_esta_eschu) {*/
                         con.execute("/system/scheduler/add name=Elimina-Tiempo-de-"+value[0]+
-                                " start-date="+fecha+" start-time="+hora+" interval=01:00:00 comment=MikroFicha-Elimina-Ficha-Tiempo-"+value[0]+
+                                " start-date="+fecha+" start-time="+hora+" interval=00:05:00 comment=MikroFicha-Elimina-Ficha-Tiempo-"+value[0]+
                                 " on-event=\"/ip hotspot user remove [find uptime="+value[3]+" limit-uptime="+value[3]+"]\"");
                    // }
 
