@@ -130,7 +130,7 @@
         -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-7572150509502514~7969142634" />
+            android:value="ca-app-pub-8581380224867392~6496767761" />
     </application>
 
 </manifest>

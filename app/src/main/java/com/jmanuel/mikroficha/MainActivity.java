@@ -470,8 +470,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                     public void onComplete(@NonNull Task<Boolean> task) {
                         prefences = MainActivity.this.getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
                         editor = prefences.edit();
-                        editor.putBoolean("ADMOB", (Boolean) remoteConfig.getBoolean("ADMOB"));
-                        editor.putBoolean("MIKROBOT", (Boolean) remoteConfig.getBoolean("MIKROBOT"));
+                        editor.putBoolean("ADMOB", (Boolean) remoteConfig.getBoolean("admob"));
+                        editor.putBoolean("MIKROBOT", (Boolean) remoteConfig.getBoolean("botonmikrobot"));
                         editor.apply();
 
                         mDatabase.child("UUID_APP").addValueEventListener(new ValueEventListener() {

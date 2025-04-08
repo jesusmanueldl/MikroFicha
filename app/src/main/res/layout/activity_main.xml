@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         ads:adSize="SMART_BANNER"
-        ads:adUnitId="ca-app-pub-7572150509502514/4634242717">
+        ads:adUnitId="ca-app-pub-3940256099942544/9214589741">
     </com.google.android.gms.ads.AdView>
     <!-- ca-app-pub-7572150509502514/4634242717-->
 
@@ -35,7 +35,7 @@
             android:columnCount="2"
             android:layout_marginBottom="10dp"
             android:paddingBottom="10dp"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="10dp"
             android:rowCount="6">
 
             <androidx.cardview.widget.CardView

@@ -23,13 +23,12 @@
             android:layout_marginBottom="5dp"
             ></TextView>
 
-        <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+        <com.google.android.gms.ads.AdView
             android:id="@+id/adView2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            ads:adSize="MEDIUM_RECTANGLE"
-            ads:adUnitId="ca-app-pub-7572150509502514/4634242717">
-        </com.google.android.gms.ads.AdView>
+            app:adSize="MEDIUM_RECTANGLE"
+            app:adUnitId="ca-app-pub-3940256099942544/9214589741"></com.google.android.gms.ads.AdView>
 
         <TextView
             android:layout_width="match_parent"
