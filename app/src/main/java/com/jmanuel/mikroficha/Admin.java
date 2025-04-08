@@ -104,6 +104,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -216,6 +217,8 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
     private final String TAG = "Routerapp";
     //==============================
     private String NameFile = "";
+
+    private TextView trafficInfo;
 
     PdfDocument pdfDocument = new PdfDocument();
 
@@ -347,18 +350,36 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
 
         //Grafica
         grafica = findViewById(R.id.graph_admin);
-        seriesTX = new LineGraphSeries<DataPoint>();
-        seriesRX = new LineGraphSeries<DataPoint>();
-        seriesTX.setColor(Color.RED);
+
+        seriesTX = new LineGraphSeries<>();
+        seriesTX.setColor(Color.parseColor("#F44336")); // Rojo moderno
+        seriesTX.setThickness(4);
+        seriesTX.setDrawBackground(true);
+        seriesTX.setBackgroundColor(Color.parseColor("#44F44336")); // Transparencia
+        seriesTX.setDrawDataPoints(false);
         seriesTX.setTitle("Tx");
-        seriesRX.setColor(Color.BLUE);
+
+        seriesRX = new LineGraphSeries<>();
+        seriesRX.setColor(Color.parseColor("#2196F3")); // Azul moderno
+        seriesRX.setThickness(4);
+        seriesRX.setDrawBackground(true);
+        seriesRX.setBackgroundColor(Color.parseColor("#442196F3")); // Transparencia
+        seriesRX.setDrawDataPoints(false);
         seriesRX.setTitle("Rx");
 
         grafica.addSeries(seriesTX);
         grafica.addSeries(seriesRX);
+        grafica.getGridLabelRenderer().setHorizontalLabelsVisible(false);
+
         grafica.getLegendRenderer().setVisible(true);
         grafica.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
-        grafica.getGridLabelRenderer().setHorizontalLabelsVisible(false);
+        grafica.getLegendRenderer().setBackgroundColor(Color.TRANSPARENT);
+        grafica.getLegendRenderer().setTextSize(30);
+
+        grafica.setBackgroundColor(Color.WHITE);
+        grafica.getGridLabelRenderer().setGridColor(Color.LTGRAY);
+        grafica.getGridLabelRenderer().setHorizontalLabelsColor(Color.DKGRAY);
+        grafica.getGridLabelRenderer().setVerticalLabelsColor(Color.DKGRAY);
 
         grafica.getViewport().setXAxisBoundsManual(true);
         grafica.getViewport().setMinX(0);
@@ -367,6 +388,8 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
         grafica.getViewport().setMinY(0);
         grafica.getViewport().setMaxY(1000);
         grafica.getViewport().setScalable(true);
+
+        trafficInfo = findViewById(R.id.trafficInfo);
 
 
         ///fin grafica
@@ -1769,6 +1792,10 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
                 seriesRX.appendData(new DataPoint(mDataCounter, rx), true, DATA_COUNT);
                 seriesTX.appendData(new DataPoint(mDataCounter, tx), true, DATA_COUNT);
 
+                String downloadStr = String.format(Locale.getDefault(), "%.0f kbps", rx);
+                String uploadStr = String.format(Locale.getDefault(), "%.0f kbps", tx);
+                trafficInfo.setText("Download: " + downloadStr + " Upload: " + uploadStr);
+
                 // actualizar el contador de datos
                 mDataCounter++;
 
@@ -1777,17 +1804,42 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
                 grafica.getViewport().setMinX(mDataCounter - DATA_COUNT);//minX);//mDataCounter - DATA_COUNT);
                 grafica.getViewport().setMaxX(mDataCounter);
 
-                //calcular el valor maximo y minimo de los datos Rx
-                double rxMax = seriesRX.getHighestValueY();
-                double rxMin = seriesRX.getLowestValueY();
+                int windowSize = 30; // cantidad de puntos recientes
+                double txMax = Double.MIN_VALUE, txMin = Double.MAX_VALUE;
+                double rxMax = Double.MIN_VALUE, rxMin = Double.MAX_VALUE;
 
-                //calcular el valor maximo y minimo de los datos Tx
-                double txMax = seriesTX.getHighestValueY();
-                double txMin = seriesTX.getLowestValueY();
+                int txStart = Math.max(0, mDataCounter - windowSize);
+                int rxStart = Math.max(0, mDataCounter - windowSize);
+
+                Iterator<DataPoint> itTx = seriesTX.getValues(txStart, mDataCounter);
+                while (itTx.hasNext()) {
+                    DataPoint dp = itTx.next();
+                    txMax = Math.max(txMax, dp.getY());
+                    txMin = Math.min(txMin, dp.getY());
+                }
+
+                Iterator<DataPoint> itRx = seriesRX.getValues(rxStart, mDataCounter);
+                while (itRx.hasNext()) {
+                    DataPoint dp = itRx.next();
+                    rxMax = Math.max(rxMax, dp.getY());
+                    rxMin = Math.min(rxMin, dp.getY());
+                }
+
+                double minY = Math.min(rxMin, txMin);
+                double maxY = Math.max(rxMax, txMax);
+
+                // Evita que quede plano si los valores son iguales
+                if (minY == maxY) {
+                    // Si los valores son iguales, usa un rango base mínimo para evitar gráfico plano
+                    minY = 0;
+                    maxY = minY + 20; // mínimo 20 kbps de altura visual
+                }
+                double centerY = (minY + maxY) / 2;
+                double rangeY = (maxY - minY) * 0.55;
 
                 grafica.getViewport().setYAxisBoundsManual(true);
-                grafica.getViewport().setMinY(Math.min(rxMin, txMin) * 0.9); //10%mas bajo que el valor minimo
-                grafica.getViewport().setMaxY(Math.max(rxMax, txMax) * 1.1); //10%mas alto que el valor maximo
+                grafica.getViewport().setMinY(centerY - rangeY);
+                grafica.getViewport().setMaxY(centerY + rangeY);
 
                 // actualizar la vista del gráfico
                 grafica.onDataChanged(true, true);

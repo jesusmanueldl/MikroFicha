@@ -557,10 +557,21 @@
                 app:cardElevation="10dp"
                 app:cardCornerRadius="5dp">
 
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/trafficInfo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Download: 0 kbps Upload: 0 kbps"
+                        android:textSize="14sp"
+                        android:padding="8dp"
+                        android:textColor="@android:color/darker_gray"
+                        android:layout_gravity="center_horizontal" />
 
                     <com.jjoe64.graphview.GraphView
                         android:id="@+id/graph_admin"
@@ -572,6 +583,7 @@
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
+
 
 
         </LinearLayout>
