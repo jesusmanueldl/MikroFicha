@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/usuario_hotspot"
+        android:title="Usuarios Hotspot"
+        app:showAsAction="never">
+    </item>
+
+    <item
+        android:id="@+id/servidor_hotspot"
+        android:title="Router Hotspot"
+        app:showAsAction="never">
+    </item>
+
+    <item
+        android:id="@+id/impr_blue"
+        android:title="+ Impresora BT"
+        app:showAsAction="never">
+    </item>
+</menu>

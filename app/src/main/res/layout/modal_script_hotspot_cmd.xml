@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_margin="15dp"
+        android:background="#02C1D8"
+        android:fontFamily="monospace"
+        android:gravity="center"
+        android:text="Hotspot Execute"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"></TextView>
+
+   <ScrollView
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:scrollbars="vertical"
+       android:orientation="vertical">
+
+       <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:orientation="vertical">
+
+           <TextView
+               android:id="@+id/titulo_modal_script_router"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_marginHorizontal="15dp"
+               android:layout_marginBottom="5dp"
+               android:text="Titulo"
+               android:textSize="16sp"
+               android:textStyle="bold"></TextView>
+
+           <TextView
+               android:id="@+id/info_modal_script_router"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_marginHorizontal="15dp"
+               android:layout_marginBottom="5dp"
+               android:fontFamily="serif"
+               android:autoSizeTextType="uniform"
+               android:text="Info"></TextView>
+
+           <TextView
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_marginHorizontal="15dp"
+               android:layout_marginBottom="5dp"
+               android:background="#BF2FE4"
+               android:text="/system/script/*SCRIPT*"
+               android:textAlignment="center"
+               android:textColor="@color/white"
+               android:textStyle="bold"></TextView>
+
+           <EditText
+               android:id="@+id/cmd_modal_script_router"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_marginHorizontal="15dp"
+               android:background="@color/purple_700"
+               android:fontFamily="monospace"
+               android:gravity="top|left"
+               android:hint="Script_hotspot_cmd"
+               android:inputType="textMultiLine"
+               android:minLines="2"
+               android:maxLines="15"
+               android:overScrollMode="always"
+               android:scrollbarStyle="insideInset"
+               android:scrollbars="vertical"
+               android:scrollHorizontally="false"
+               android:textColor="#AEAEAE"
+               android:textSize="14sp"
+               android:textColorHighlight="#F3F3F3"
+               android:textCursorDrawable="@drawable/edit_text_cursor"
+               android:textStyle="bold"></EditText>
+
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:orientation="horizontal"
+               android:gravity="center">
+
+               <Button
+                   android:id="@+id/btn_agregar_modal_script_hotspot"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Ejecutar"
+                   android:backgroundTint="#4961F6"
+                   android:layout_margin="5dp"
+                   ></Button>
+
+               <Button
+                   android:id="@+id/btn_cancelar_modal_script_hotspot"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Cancelar"
+                   android:backgroundTint="#9C9C9C"
+                   android:layout_margin="5dp"></Button>
+           </LinearLayout>
+
+       </LinearLayout>
+
+   </ScrollView>
+
+</LinearLayout>

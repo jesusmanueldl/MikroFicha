@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_margin="8dp"
+        >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Generar Ficha"
+            android:textColor="#FFFFFF"
+            android:textSize="25dp"
+            android:background="@drawable/gradiente_admin3"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="5dp"
+            ></TextView>
+
+        <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/adView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            ads:adSize="MEDIUM_RECTANGLE"
+            ads:adUnitId="ca-app-pub-7572150509502514/4634242717">
+        </com.google.android.gms.ads.AdView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Seleccione el servidor"
+            android:textSize="15dp"></TextView>
+
+        <Spinner
+            android:id="@+id/servidores_ficha"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            >
+        </Spinner>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Seleccione el Plan"
+            android:textSize="15dp"></TextView>
+
+        <Spinner
+            android:id="@+id/planes_ficha"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            >
+        </Spinner>
+
+        <TextView
+            android:id="@+id/limite_ficha_admin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:text="-"></TextView>
+
+        <EditText
+            android:id="@+id/n_fichas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Cantidad de fichas"
+            android:inputType="number"
+            android:maxLength="3"
+            android:text="1"></EditText>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Diseño de la ficha"
+            android:textSize="20dp"
+            android:gravity="center"
+            android:background="@drawable/gradiente_admin3"
+            android:textColor="@color/white"
+            android:layout_margin="8dp"
+            android:textStyle="bold"></TextView>
+
+        <ImageView
+            android:id="@+id/disenio"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_gravity="center_horizontal"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/fichabackground">
+
+        </ImageView>
+
+        <Button
+            android:id="@+id/cambiar_disenio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:backgroundTint="#F4511E"
+            android:text="Cambiar Diseño"></Button>
+
+        <TextView
+            android:id="@+id/dimensiones_tit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:gravity="center"
+            android:background="#8BC34A"
+            android:textColor="@color/white"
+            android:text="Dimensiones"></TextView>
+
+        <TextView
+            android:id="@+id/texto_dimensiones"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="8dp"
+            android:text="Mín: 3cm x 2cm -- Máx: 5cm x 5cm"></TextView>
+
+        <RadioGroup
+            android:id="@+id/opciones_dimensiones_admin_ticket"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:visibility="gone">
+
+            <RadioButton
+                android:id="@+id/pin_admin_ticket"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="58mm"></RadioButton>
+            <RadioButton
+                android:id="@+id/user_contra_admin_ticket"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="80mm"></RadioButton>
+        </RadioGroup>
+
+        <LinearLayout
+            android:id="@+id/layout_admin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ancho"></TextView>
+
+            <EditText
+                android:id="@+id/ancho"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:hint="Ancho"
+                android:inputType="number"
+                android:text="5"></EditText>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Alto"></TextView>
+
+            <EditText
+                android:id="@+id/alto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3"
+                android:hint="Alto"
+                android:inputType="number"
+                android:layout_margin="5dp"></EditText>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:gravity="center"
+            android:background="@drawable/gradiente_admin3"
+            android:textColor="@color/white"
+            android:text="PIN ó [Usuario y contraseña]"></TextView>
+
+        <RadioGroup
+            android:id="@+id/opciones_user_pin_admin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
+
+            <RadioButton
+                android:id="@+id/pin_admin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="PIN"></RadioButton>
+            <RadioButton
+                android:id="@+id/user_contra_admin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Usuario y Contraseña"></RadioButton>
+        </RadioGroup>
+
+        <RadioGroup
+            android:id="@+id/opciones_minus_mayus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
+
+            <RadioButton
+                android:id="@+id/minuscula_admin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="minúscula"></RadioButton>
+            <RadioButton
+                android:id="@+id/mayuscula_admin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MAYÚSCULA"></RadioButton>
+        </RadioGroup>
+
+        <LinearLayout
+            android:id="@+id/info_hoja_admin"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_margin="8dp"
+            >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:gravity="center"
+                android:background="@drawable/gradiente_admin3"
+                android:textColor="@color/white"
+                android:text="Orientación, Hoja A4 / T-Carta"></TextView>
+
+            <RadioGroup
+                android:id="@+id/opciones_grupo_radio_ficha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_margin="10dp">
+
+                <RadioButton
+                    android:id="@+id/vertical_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Vertical"></RadioButton>
+                <RadioButton
+                    android:id="@+id/horizontal_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Horizontal"></RadioButton>
+            </RadioGroup>
+
+            <TextView
+                android:id="@+id/total_por_hoja"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="Fichas por hoja, tamaño y orientación:"
+                android:textColor="#E91E63"
+                android:textSize="15dp"
+                android:textStyle="bold|italic"></TextView>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/info_ticket_admin"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_margin="8dp"
+            android:visibility="gone"
+            >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:gravity="center"
+                android:background="@drawable/gradiente_admin3"
+                android:textColor="@color/white"
+                android:text="Elementos del ticket"></TextView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="Nombre de la empresa"></TextView>
+
+            <EditText
+                android:id="@+id/nombre_empresa"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Nombre de la empresa"
+                android:text="MIKROFICHA"></EditText>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="Contenido del ticket"></TextView>
+
+            <CheckBox
+                android:id="@+id/mostrar_logo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:checked="true"
+                android:text="Mostrar Logo">
+
+            </CheckBox>
+
+            <CheckBox
+                android:id="@+id/codigo_qr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mostrar QR">
+
+            </CheckBox>
+
+            <CheckBox
+                android:id="@+id/plan_ticket"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mostrar Plan">
+
+            </CheckBox>
+
+            <CheckBox
+                android:id="@+id/precio_ticket"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mostrar Precio">
+
+            </CheckBox>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="Símbolo de Moneda"></TextView>
+
+            <EditText
+                android:id="@+id/moneda_sombolo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="Símbolo de Moneda"
+                android:text="$"></EditText>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/impresoras_ticket_admin"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_margin="8dp"
+            android:visibility="gone"
+            >
+
+            <TextView
+                android:id="@+id/sel_imp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:text="Seleccione impresora: Conectado ❌"
+                android:textSize="15dp"></TextView>
+
+            <Spinner
+                android:id="@+id/impresoras_ticket_admin_ficha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                >
+            </Spinner>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp"
+            android:gravity="center">
+            <Button
+                android:id="@+id/btn_agregar_modal_ficha"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Generar"
+                android:layout_margin="5dp"
+                android:backgroundTint="#4961F6"
+                ></Button>
+
+            <Button
+                android:id="@+id/btn_cancelar_modal_ficha"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancelar"
+                android:backgroundTint="#9C9C9C"
+                android:layout_margin="5dp"></Button>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
+
+

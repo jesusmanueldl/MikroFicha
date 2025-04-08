@@ -1,0 +1,86 @@
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/drawable/edit_text_cursor.xml" value="0.114" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/drawable/gradiente__admin2.xml" value="0.171" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/drawable/gradiente_admin1.xml" value="0.171" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/drawable/gradiente_admin2.xml" value="0.171" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/drawable/gradiente_admin3.xml" value="0.1705" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/drawable/gradiente_admin4.xml" value="0.1705" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/activity_admin.xml" value="0.2" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/activity_fichas_pdf.xml" value="0.1361111111111111" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/activity_ipbinding.xml" value="0.13541666666666666" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/activity_main.xml" value="0.12" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/activity_planes.xml" value="0.1361111111111111" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/activity_precios.xml" value="0.2" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/activity_router.xml" value="0.1" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/activity_script_admin_hotspot.xml" value="0.13541666666666666" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/activity_ter_con_poli.xml" value="0.18" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/activity_usuario.xml" value="0.1361111111111111" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/activity_usuario_activo.xml" value="0.1361111111111111" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/modal_WfiScan.xml" value="0.1" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/modal_WifiScan.xml" value="0.1361111111111111" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/modal_agregar_ficha.xml" value="0.18" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/modal_agregar_ipbinding.xml" value="0.22" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/modal_agregar_plan.xml" value="0.1" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/modal_agregar_router.xml" value="0.1" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/modal_script_hotspot_cmd.xml" value="0.18" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/modal_wifiscan.xml" value="0.12" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/recycler_ficha_desing.xml" value="0.1" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/recycler_ipbinding_desing.xml" value="0.25" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/recycler_planes_desing.xml" value="0.22" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/recycler_router_desing.xml" value="0.18" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/recycler_script_hotspot_desing.xml" value="0.18" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/recycler_usuario_activo_desing.xml" value="0.22" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/recycler_usuario_desing.xml" value="0.25" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/recycler_wifiscan_desing.xml" value="0.25" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/layout/spinner_disenio.xml" value="0.1" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/menu/menu_admin.xml" value="0.1361111111111111" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/menu/menu_admin_config.xml" value="0.1361111111111111" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/menu/menu_ipbinding.xml" value="0.1267361111111111" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/menu/menu_planes.xml" value="0.1361111111111111" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/menu/menu_recycler.xml" value="0.1361111111111111" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/menu/menu_recycler_planes.xml" value="0.25" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/menu/menu_recycler_router.xml" value="0.1361111111111111" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/menu/menu_recycler_usuario.xml" value="0.21720116618075802" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/menu/menu_recycler_usuario_activo.xml" value="0.1361111111111111" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/menu/menu_router.xml" value="0.21" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/menu/menu_usuario.xml" value="0.1361111111111111" />
+        <entry key="..\:/Users/Jeslid/AndroidStudioProjects/MikroFicha/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1825" />
+        <entry key="..\:/Users/dacbi/Downloads/JESUSMANUEL_APK/MikroFicha/app/src/main/res/drawable/border_table.xml" value="0.176" />
+        <entry key="..\:/Users/dacbi/Downloads/JESUSMANUEL_APK/MikroFicha/app/src/main/res/drawable/ic_baseline_more_vert_24.xml" value="0.176" />
+        <entry key="..\:/Users/dacbi/Downloads/JESUSMANUEL_APK/MikroFicha/app/src/main/res/layout/activity_admin.xml" value="0.18" />
+        <entry key="..\:/Users/dacbi/Downloads/JESUSMANUEL_APK/MikroFicha/app/src/main/res/layout/activity_main.xml" value="0.13541666666666666" />
+        <entry key="..\:/Users/dacbi/Downloads/JESUSMANUEL_APK/MikroFicha/app/src/main/res/layout/activity_planes.xml" value="0.13333333333333333" />
+        <entry key="..\:/Users/dacbi/Downloads/JESUSMANUEL_APK/MikroFicha/app/src/main/res/layout/activity_router.xml" value="0.2" />
+        <entry key="..\:/Users/dacbi/Downloads/JESUSMANUEL_APK/MikroFicha/app/src/main/res/layout/activity_usuario.xml" value="0.13333333333333333" />
+        <entry key="..\:/Users/dacbi/Downloads/JESUSMANUEL_APK/MikroFicha/app/src/main/res/layout/modal_agregar_router.xml" value="0.16182572614107885" />
+        <entry key="..\:/Users/dacbi/Downloads/JESUSMANUEL_APK/MikroFicha/app/src/main/res/layout/prueba2.xml" value="0.2" />
+        <entry key="..\:/Users/dacbi/Downloads/JESUSMANUEL_APK/MikroFicha/app/src/main/res/layout/recycler_planes_desing.xml" value="0.33" />
+        <entry key="..\:/Users/dacbi/Downloads/JESUSMANUEL_APK/MikroFicha/app/src/main/res/layout/recycler_router_desing.xml" value="0.24375" />
+        <entry key="..\:/Users/dacbi/Downloads/JESUSMANUEL_APK/MikroFicha/app/src/main/res/layout/recycler_usuario_desing.xml" value="0.25" />
+        <entry key="..\:/Users/dacbi/Downloads/JESUSMANUEL_APK/MikroFicha/app/src/main/res/menu/manue_admin.xml" value="0.16417272338606242" />
+        <entry key="..\:/Users/dacbi/Downloads/JESUSMANUEL_APK/MikroFicha/app/src/main/res/menu/menu_recycler.xml" value="0.13333333333333333" />
+        <entry key="..\:/Users/dacbi/Downloads/JESUSMANUEL_APK/MikroFicha/app/src/main/res/menu/menu_recycler_planes.xml" value="0.13333333333333333" />
+        <entry key="..\:/Users/dacbi/Downloads/JESUSMANUEL_APK/MikroFicha/app/src/main/res/menu/menu_recycler_router.xml" value="0.13333333333333333" />
+        <entry key="..\:/Users/dacbi/Downloads/JESUSMANUEL_APK/MikroFicha/app/src/main/res/menu/menu_recycler_usuario.xml" value="0.13333333333333333" />
+        <entry key="..\:/Users/dacbi/Downloads/JESUSMANUEL_APK/MikroFicha/app/src/main/res/menu/menu_router.xml" value="0.2" />
+        <entry key="..\:/Users/dacbi/Downloads/JESUSMANUEL_APK/MikroFicha/app/src/main/res/xml/border_grid.xml" value="0.13333333333333333" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="jbr-17" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+  <component name="VisualizationToolProject">
+    <option name="state">
+      <ProjectState>
+        <option name="scale" value="0.17" />
+      </ProjectState>
+    </option>
+  </component>
+</project>

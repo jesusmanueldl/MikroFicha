@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/editar_binding"
+        android:title="Editar"
+        app:showAsAction="never">
+    </item>
+    <item
+        android:id="@+id/habilitar_binding"
+        android:title="Habilitar"
+        app:showAsAction="never">
+    </item>
+    <item
+        android:id="@+id/deshabilitar_binding"
+        android:title="Deshabilitar"
+        app:showAsAction="never">
+    </item>
+    <item
+        android:id="@+id/eliminar_binding"
+        android:title="Eliminar"
+        app:showAsAction="never">
+    </item>
+
+</menu>

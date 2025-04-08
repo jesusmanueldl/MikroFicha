@@ -1,0 +1,398 @@
+MikroFicha: Genera, Administra y Vende Internet por Fichas​
+
+Descripción: MikroFicha es una aplicación móvil para Android diseñada para generar, administrar y vender acceso a Internet mediante fichas, vouchers o tickets, especialmente para Hotspot Mikrotik en RouterBoard versiones 6+.​
+
+Versión Actual: Framboyán v3.9.2 (Actualizada el 20 de marzo de 2025)​
+
+Requisitos: Android 6.0 o versiones posteriores​
+Descargas: Más de 5,000​
+Características Principales:
+
+Generación de más de 300 fichas con un plan de suscripción​
+
+Creación de fichas en PDF o impresión directa de hasta 100 fichas en impresoras térmicas Bluetooth​
+
+Conexión remota a routers Mikrotik mediante VPN sin necesidad de IP pública​
+
+Gestión completa de planes: agregar, eliminar y editar​
+Funcionalidad de tiempo corrido para evitar reinicios de tiempo en fichas​
+
+Notificaciones en tiempo real de conexiones de fichas​
+
+Opciones de generación de fichas con PIN o usuario y contraseña​
+
+Personalización de PIN en mayúsculas o minúsculas​
+Gráficas de monitoreo de consumo de interfaces​
+
+Eliminación automática de fichas una vez finalizado el tiempo​
+
+Identificación única de la aplicación mediante UUID para opciones premium​
+
+Compartir fichas fácilmente en formato PDF​
+
+Conexión API: La aplicación se conecta al servicio API de Mikrotik a través del puerto correspondiente. Es esencial habilitar este servicio en el router para garantizar una comunicación adecuada.​
+
+
+VPN MikroFicha Cloud: MikroFicha ofrece un servicio VPN mediante WireGuard, permitiendo a los usuarios acceder y administrar sus routers Mikrotik desde cualquier lugar del mundo. Para más información sobre este servicio, contacta a hola@mikroficha.com o visita el canal de Telegram https://t.me/Mikroficha.​
+
+
+Impresión de Fichas: La aplicación permite la impresión de fichas en impresoras térmicas Bluetooth, facilitando la distribución física de accesos a los clientes. Además, se pueden generar fichas en PDF para su impresión posterior o envío digital.​
+
+Monitoreo de Interfaces: MikroFicha proporciona herramientas para monitorear en tiempo real el consumo de las interfaces de internet, incluyendo parámetros de carga (Tx) y descarga (Rx), así como velocidades de transmisión.​
+
+Diseño Personalizado de Fichas: Los usuarios pueden diseñar sus propias fichas utilizando plantillas disponibles, adaptándolas a las necesidades específicas de su negocio. Se ofrece un molde en PowerPoint para facilitar la personalización.​
+
+=======================
+Planes de Suscripción:
+=======================
+
+Gratis: Permite generar hasta 5 fichas simultáneamente, administrar un router Mikrotik, crear hasta 5 planes, incluye publicidad y marca de agua, sin asistencia técnica.​
+
+Mensual: Por $99 MXN al mes, permite generar 100 fichas simultáneamente, administrar 2 routers Mikrotik, crear hasta 15 planes, elimina publicidad y marca de agua, incluye copias de seguridad, pero sin asistencia técnica.​
+
+Anual: Por $999 MXN al año, permite generar más de 300 fichas simultáneamente, administrar hasta 10 routers Mikrotik, crear hasta 50 planes, evita reinicios por fallas eléctricas, notificaciones de fichas activas, asistencia técnica, scripts adicionales, copias de seguridad, plantilla hotspot gratuita, sin publicidad ni marca de agua.​
+
+Contacto y Soporte: Para consultas, soporte o más información, los usuarios pueden contactar a MikroFicha a través de:​
+
+Correo electrónico: hola@mikroficha.com​
+Facebook: https://www.facebook.com/mikroficha​
+Telegram: https://t.me/Mikroficha​
+Política de Privacidad: MikroFicha se compromete a proteger la información personal de sus usuarios. La aplicación puede recopilar datos como nombre, información de contacto y datos demográficos para mejorar el servicio. Se garantiza la seguridad de esta información y no se compartirá con terceros sin consentimiento, salvo requerimiento legal.​
+
+
+Newsletter: Los usuarios pueden suscribirse al boletín de noticias de MikroFicha para recibir actualizaciones, nuevas funcionalidades y ofertas especiales. Solo se requiere proporcionar una dirección de correo electrónico para comenzar a recibir las novedades.​
+
+
+Tutoriales y Recursos Adicionales: MikroFicha ofrece tutoriales, como la configuración de notificaciones de Telegram en MikroTik, disponibles en su blog. Estos recursos ayudan a los usuarios a maximizar el uso de la aplicación y mejorar la gestión de sus redes.​
+
+
+Descargas: La aplicación está disponible para descarga en Google Play y en el sitio oficial de MikroFicha. Se recomienda siempre descargar la última versión estable para garantizar el mejor rendimiento y acceso a las últimas funcionalidades.
+
+=======================
+ASISTENTE MIKROBOT - BASE DE CONOCIMIENTO
+=======================
+
+📌 ¿Qué es MikroFicha?
+MikroFicha es una aplicación móvil diseñada para generar, administrar y vender fichas de acceso a Internet utilizando routers MikroTik. Su objetivo principal es facilitar la gestión de usuarios en redes hotspot mediante tickets, pines o vouchers personalizados.
+
+La aplicación está orientada tanto a pequeños negocios como a usuarios avanzados que gestionan puntos de acceso público a Internet, ciber cafés, zonas WiFi comunitarias o ventas por tiempo de navegación.
+
+=======================
+FUNCIONALIDADES PRINCIPALES
+=======================
+
+✅ Generación de Fichas:
+- Puedes generar fichas con tiempo límite, consumo por datos o ambos.
+- Soporta formatos con PIN único o usuario y contraseña.
+- Las fichas pueden imprimirse en PDF o directamente desde impresoras térmicas Bluetooth compatibles.
+- Permite personalizar el número de fichas, longitud del PIN y su formato (mayúsculas/minúsculas/números).
+
+✅ Gestión de Planes:
+- Puedes crear distintos planes de navegación (por minutos, horas, días o MB).
+- Puedes asignar perfiles de MikroTik a cada plan.
+- Puedes editar o eliminar planes fácilmente desde la app.
+
+✅ Conexión Remota:
+- Es posible conectar a routers MikroTik a través de red local o vía VPN (MikroFicha Cloud con WireGuard).
+- No es necesario tener IP pública ni abrir puertos en tu red.
+
+✅ Monitoreo:
+- Visualiza gráficas de carga y descarga en tiempo real.
+- Consulta la cantidad de usuarios conectados.
+- Visualiza estadísticas de consumo por interfaz (Ether, WiFi, etc.).
+
+✅ Impresión de Fichas:
+- Compatible con impresoras térmicas Bluetooth portátiles.
+- Diseño personalizable para los tickets.
+- Plantillas de diseño disponibles para modificar en PowerPoint.
+
+✅ Notificaciones:
+- MikroFicha puede notificar cuando una ficha se activa, se agota el tiempo o se termina el saldo.
+- Las notificaciones se pueden enviar por sonido, mensaje dentro de la app o incluso por Telegram (configurable en el router MikroTik).
+
+✅ Exportación e Importación:
+- Puedes exportar tus fichas en PDF o enviarlas por WhatsApp, correo, etc.
+- También puedes importar configuraciones o planes guardados.
+
+=======================
+PLANES DE SUSCRIPCIÓN o PRECIOS,COSTOS DEL SERVICIO
+=======================
+
+🔸 Plan Gratuito:
+- Hasta 5 fichas simultáneas.
+- 1 router MikroTik.
+- Hasta 5 planes.
+- Incluye marca de agua y anuncios.
+- Sin asistencia técnica.
+- Sin asistencia MikroBot IA.
+
+🔸 Plan Mensual ($99 MXN/mes):
+- Hasta 100 fichas simultáneas.
+- Hasta 2 routers MikroTik.
+- Hasta 15 planes.
+- Sin anuncios ni marca de agua.
+- Copias de seguridad incluidas.
+- Sin asistencia técnica.
+- Asistente MikroBot IA incluido
+
+🔸 Plan Anual ($999 MXN/año):
+- Hasta 300 fichas simultáneas.
+- Hasta 10 routers MikroTik.
+- Hasta 50 planes.
+- Plantilla Hotspot personalizada gratuita.
+- Sin anuncios ni marca de agua.
+- Notificaciones avanzadas.
+- Scripts adicionales.
+- Asistencia técnica personalizada.
+- Asistente MikroBot IA incluido
+- Acceso a comunidad exclusiva.
+
+=======================
+REQUISITOS TÉCNICOS
+=======================
+
+- Dispositivo Android 6.0 o superior.
+- Router MikroTik con Hotspot habilitado.
+- Servicio API habilitado en MikroTik (puerto por defecto: 8728).
+- Conexión local o por VPN si se gestiona remotamente.
+- Para imprimir, una impresora térmica Bluetooth compatible.
+
+=======================
+CONFIGURACIONES AVANZADAS
+=======================
+
+✅ MikroFicha Cloud (VPN WireGuard):
+- Servicio exclusivo que permite conectar a tus routers desde cualquier lugar sin IP pública.
+- Se configura fácilmente desde la app con ayuda del soporte.
+- Ofrece mayor estabilidad y seguridad.
+
+✅ Scripts Adicionales:
+- Puedes ejecutar scripts personalizados para tareas como:
+  - Reset de fichas
+  - Notificaciones a Telegram
+  - Cierre de sesiones inactivas
+  - Reenvío de logs
+
+=======================
+USOS FRECUENTES DE LA APP
+=======================
+
+- Zonas WiFi comunitarias.
+- Cibercafés o centros de copiado.
+- Acceso a Internet por tiempo en tiendas o cafés.
+- Gestión de redes para escuelas o eventos.
+- Venta de Internet por tiempo en mercados o ferias.
+
+=======================
+ASISTENCIA TÉCNICA
+=======================
+
+📧 Correo: hola@mikroficha.com  
+📱 Telegram: https://t.me/Mikroficha  
+📘 Facebook: https://facebook.com/mikroficha  
+
+Canal oficial con actualizaciones, tips, scripts y soporte técnico.
+
+=======================
+PREGUNTAS FRECUENTES
+=======================
+
+❓ ¿Cómo agregar un nuevo plan?
+→ Desde el menú "Planes", pulsa "+" y define el nombre, duración y perfil MikroTik.
+
+❓ ¿Cómo generar fichas?
+→ Selecciona el plan, elige la cantidad, tipo (PIN o user/pass), y pulsa "Generar".
+
+❓ ¿Cómo imprimir una ficha?
+→ Ve a la vista de fichas generadas y selecciona la opción "Imprimir" (requiere impresora Bluetooth vinculada).
+
+❓ ¿Qué pasa si se va la luz?
+→ Con el plan anual, las fichas no se reinician al volver la energía.
+
+❓ ¿Cómo activar las notificaciones por Telegram?
+→ Debes configurar un script especial en tu router MikroTik que envíe mensajes al bot de Telegram con los datos de conexión.
+
+=======================
+POLÍTICA DE PRIVACIDAD
+=======================
+
+MikroFicha no recopila información personal sensible del usuario. Únicamente se solicita información básica para registro y funcionamiento interno. Los datos no son compartidos con terceros sin autorización del usuario.
+
+=======================
+ACTUALIZACIONES
+=======================
+
+MikroFicha se actualiza constantemente con mejoras, corrección de errores y nuevas funcionalidades solicitadas por la comunidad. Mantente conectado al canal de Telegram para no perderte novedades.
+
+=======================
+Métodos de Pago para Suscripciones en MikroFicha
+=======================
+
+
+Descripción: MikroFicha ofrece diversas opciones de pago para adaptarse a las necesidades de sus usuarios. A continuación, se detallan los métodos disponibles para adquirir las suscripciones Mensual y Anual.
+
+Métodos de Pago Disponibles:
+
+Pagos a través de la aplicación (Google Play):
+
+Las suscripciones se pueden adquirir directamente desde la aplicación MikroFicha mediante Google Play. Los precios pueden variar según la región del usuario.
+Transferencias por PayPal (fuera de México):
+
+Para usuarios fuera de México, se acepta PayPal como método de pago. Es importante considerar que se añadirá al precio de cada plan la comisión vigente por transacción, que incluye un porcentaje y una comisión fija.
+
+Transferencias por Western Union:
+
+También se aceptan pagos a través de Western Union. En este caso, el cliente es responsable de cubrir la comisión vigente en el momento de la transacción.
+
+Consideraciones Importantes:
+
+Comisiones Adicionales: Al utilizar métodos de pago como PayPal o Western Union, es fundamental tener en cuenta las comisiones adicionales que se aplicarán al precio del plan seleccionado.
+
+Precios en Dólares Estadounidenses (USD): Para pagos realizados fuera de México, los precios de los planes se establecen en dólares estadounidenses.
+
+
+Política de Reembolso: No se ofrecen reembolsos en las suscripciones, ya que existe una versión gratuita de la aplicación que permite a los usuarios probar sus funcionalidades antes de optar por un plan de pago.
+
+Cambio de Dispositivo: Si el usuario pierde su dispositivo móvil o este deja de funcionar, la licencia (ya sea mensual o anual) se respetará, siempre que el usuario tenga contratado un plan en el sistema de MikroFicha. En este caso, se procederá a cambiar el UUID (Identificador Único) de la aplicación.
+
+
+===========================
+Plataformas Compatibles con MikroFicha
+===========================
+
+MikroFicha es una aplicación diseñada exclusivamente para dispositivos móviles Android. Actualmente, la app no está disponible de forma nativa para otras plataformas.
+
+✅ Plataformas compatibles:
+- Android (disponible en Google Play o mediante APK desde el sitio oficial)
+
+❌ Plataformas NO compatibles:
+- iOS (iPhone/iPad)
+- Windows (PC)
+- Linux
+- macOS
+
+🔍 Nota adicional:
+Aunque MikroFicha no tiene versión para PC o Mac, los usuarios que deseen ejecutarla en computadoras pueden hacerlo mediante emuladores Android como:
+- BlueStacks
+- NoxPlayer
+- MEmu
+
+⚠ Advertencia:
+El uso de emuladores no está oficialmente soportado ni garantizado por los desarrolladores de MikroFicha.
+
+===========================
+Disponibilidad Geográfica de MikroFicha
+===========================
+
+MikroFicha es una aplicación móvil desarrollada para dispositivos Android. Está disponible a través de la plataforma Google Play Store, lo que le permite ser descargada y utilizada en la mayoría de los países donde Google Play está habilitado.
+
+✅ Disponibilidad general:
+- MikroFicha puede ser descargada en cualquier país donde:
+  - La Google Play Store esté disponible.
+  - El desarrollador haya habilitado la distribución de la app en dicha región.
+
+📌 Nota importante:
+- Hasta el momento, no se ha especificado ninguna restricción geográfica oficial sobre el uso de MikroFicha.
+- Esto significa que puede ser utilizada por usuarios de cualquier parte del mundo, siempre que tengan acceso a Google Play y cumplan con los requisitos técnicos (Android 6.0 o superior).
+
+🌐 Casos comunes:
+- Aunque la aplicación está desarrollada en México, se han reportado usuarios en países de Latinoamérica, Centroamérica, y otros países hispanohablantes que utilizan MikroFicha para administrar puntos de acceso a internet mediante routers MikroTik.
+
+📎 Recomendación:
+Para confirmar la disponibilidad en tu país, visita la Google Play Store desde tu dispositivo o consulta el sitio oficial: https://mikroficha.com
+
+===========================
+Información sobre el PIN o Contraseña generado por MikroFicha
+===========================
+
+📌 Descripción general:
+MikroFicha genera códigos o identificadores únicos conocidos como PIN para ser usados como usuario y contraseña en las fichas de acceso a Internet.
+
+🧩 Composición del PIN o Contraseña:
+El PIN está compuesto por una combinación alfanumérica estructurada de la siguiente manera:
+- Tres caracteres alfabéticos (letras)
+- Tres caracteres numéricos (dígitos)
+
+📐 Tamaño del PIN o Contraseña:
+- La longitud total del PIN es de 6 caracteres.
+- Esta estructura está diseñada para ofrecer un equilibrio entre seguridad y facilidad de uso para el usuario final.
+
+✍ Personalización del PIN o Contraseña:
+- Las letras pueden generarse en mayúsculas o minúsculas, dependiendo de la configuración elegida por el usuario.
+- También es posible que se incluyan algunos símbolos especiales en la parte alfabética, según la configuración del sistema.
+
+🗝 Usos del PIN o Contraseña:
+- Este PIN sirve tanto como identificador de usuario como contraseña, cuando se selecciona ese método de generación.
+- Se utiliza principalmente en redes hotspot gestionadas por routers MikroTik.
+
+📎 Consideraciones:
+- La generación del PIN es aleatoria, lo que garantiza que cada ficha tenga un identificador único.
+- Esta aleatoriedad contribuye a la seguridad del acceso a la red.
+
+
+=======================
+Tiempo Corrido (en Mikrotik Hotspot):
+=======================
+ Tiempo Corrido (en Mikrotik Hotspot):
+Es el tiempo total que un usuario puede estar conectado, sin importar si se desconecta o no.
+
+Empieza a contar desde que el usuario se conecta por primera vez, y sigue corriendo aunque el usuario cierre sesión o apague su dispositivo.
+
+Ejemplo: Si configuras 1 hora de tiempo corrido, el usuario solo podrá usar esa cuenta por 1 hora total, aunque se haya conectado solo 10 minutos hoy y quiera conectarse mañana.
+
+=======================
+Tiempo Pausa (o "Uptime"):
+=======================
+
+Es el tiempo efectivo de uso, solo cuenta cuando el usuario está conectado activamente al hotspot.
+
+Ejemplo: Si asignas 1 hora de tiempo pausa, el usuario puede usar esa hora en sesiones separadas (10 min hoy, 20 min después, etc.) hasta acumular 1 hora de conexión real.
+
+🟡 Diferencia Clave:
+Tiempo Corrido es un tipo de tiempo que sigue avanzando aunque el usuario esté desconectado. Es decir, desde el momento en que el usuario inicia sesión por primera vez, el reloj empieza a correr y no se detiene, aunque el usuario apague su dispositivo o se desconecte del hotspot. Por ejemplo, si le das 1 hora de tiempo corrido a una cuenta, esa hora se va a consumir aunque el usuario solo se conecte unos minutos. Al terminar esa hora, la cuenta ya no servirá.
+
+Tiempo Pausa, en cambio, solo cuenta el tiempo cuando el usuario realmente está conectado. Si el usuario se desconecta, el tiempo se detiene. Por ejemplo, si le das 1 hora de tiempo pausa, esa hora se va descontando únicamente mientras el usuario esté navegando. Puede usar 10 minutos hoy, 20 mañana y así hasta agotar el total de 1 hora.
+
+
+=======================
+¿Qué es IP Binding en Mikrotik Hotspot?
+=======================
+
+IP Binding es una función del Hotspot de Mikrotik que permite asignar reglas especiales a dispositivos específicos (por su IP o MAC address), saltándose el portal cautivo o aplicando restricciones específicas.
+
+🔸 ¿Para qué se usa IP Binding?
+Bypass (omitir el login del hotspot): Algunos dispositivos pueden navegar sin autenticarse, por ejemplo:
+
+Cámaras de seguridad
+
+Impresoras de red
+
+Equipos del administrador
+
+Bloquear acceso a ciertos dispositivos por IP o MAC.
+
+Aplicar reglas específicas sin necesidad de pasar por el sistema de usuarios del Hotspot.
+
+🔸 Tipos de IP Binding:
+Tipo	¿Qué hace?
+bypassed	El dispositivo se salta el login del hotspot y navega libremente.
+blocked	El dispositivo no puede acceder a Internet, aunque esté conectado.
+regular	No hace nada especial. Es solo informativo o para organización.
+✅ Ejemplo:
+Supón que tienes una cámara con IP 192.168.88.10 y no quieres que el hotspot le pida usuario y contraseña:
+
+Vas a IP > Hotspot > IP Bindings.
+
+Agregas una nueva entrada:
+
+Address: 192.168.88.10
+
+Type: bypassed
+
+Y listo, esa cámara ya no pasará por el portal cautivo.
+
+
+
+=======================
+FIN DEL DOCUMENTO
+=======================

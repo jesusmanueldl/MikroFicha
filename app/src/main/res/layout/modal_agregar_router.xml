@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_margin="15dp"
+        android:text="Nuevo router"
+        android:gravity="center"
+        android:textColor="#FFFFFF"
+        android:textSize="25dp"
+        android:background="@drawable/gradiente_admin3"
+        android:textStyle="bold"
+        ></TextView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/ip_modal_router"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:hint="IP"></EditText>
+
+        <EditText
+            android:id="@+id/puerto_modal_router"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:text="8728"
+            android:hint="Port API"></EditText>
+    </LinearLayout>
+
+
+    <EditText
+        android:id="@+id/usuario_modal_router"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Usuario"
+        android:layout_margin="15dp"></EditText>
+
+    <EditText
+        android:id="@+id/pass_modal_router"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Contraseña"
+        android:inputType="textPassword"
+        android:layout_margin="15dp"></EditText>
+
+    <EditText
+        android:id="@+id/comentario_modal_router"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nombre del router"
+        android:layout_margin="15dp"></EditText>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <Button
+            android:id="@+id/btn_agregar_modal_router"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Agregar"
+            android:backgroundTint="#4961F6"
+            android:layout_margin="5dp"
+            ></Button>
+
+        <Button
+            android:id="@+id/btn_cancelar_modal_router"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancelar"
+            android:backgroundTint="#9C9C9C"
+            android:layout_margin="5dp"></Button>
+    </LinearLayout>
+
+
+
+
+</LinearLayout>

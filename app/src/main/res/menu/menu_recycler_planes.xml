@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/script_falla_electrica"
+        android:title="No reiniciar tiempo"
+        app:showAsAction="never">
+    </item>
+    <item
+        android:id="@+id/editar_plan"
+        android:title="Editar"
+        app:showAsAction="never">
+    </item>
+    <item
+        android:id="@+id/eliminar_plan"
+        android:title="Eliminar"
+        app:showAsAction="never">
+    </item>
+</menu>
