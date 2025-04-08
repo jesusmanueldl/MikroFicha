@@ -13,5 +13,6 @@
         android:background="@drawable/user_bubble"
         android:padding="10dp"
         android:textColor="#FFFFFF"
+        android:textIsSelectable="true"
         android:text="Usuario" />
 </LinearLayout>
