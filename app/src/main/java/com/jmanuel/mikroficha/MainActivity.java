@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import android.Manifest;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,9 +13,11 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -74,6 +78,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import android.Manifest;
+import android.app.NotificationManager;
+import android.provider.Settings;
 //import io.grpc.util.AdvancedTlsX509KeyManager;
 
 public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener{
@@ -131,6 +138,14 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        // Verificar y pedir permiso para notificaciones en Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1001);
+            }
+        }
 
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         date = dateFormat.format(new Date());
@@ -366,6 +381,27 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             verificarActualizacion();
         },5000);
+
+        // Verificar si el usuario tiene desactivadas las notificaciones manualmente
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (!notificationManager.areNotificationsEnabled()) {
+                new androidx.appcompat.app.AlertDialog.Builder(this)
+                        .setTitle("Activar notificaciones")
+                        .setMessage("Para mantenerte informado, activa las notificaciones de esta app.")
+                        .setPositiveButton("Ir a ajustes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                                        .putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
+                                startActivity(intent);
+                            }
+                        })
+                        .setNegativeButton("Cancelar", null)
+                        .show();
+            }
+        }
+
     }
 
     @Override

@@ -116,6 +116,7 @@ import javax.net.SocketFactory;
 import me.legrange.mikrotik.ApiConnection;
 import me.legrange.mikrotik.MikrotikApiException;
 
+
 public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
     private ImageView verPlanes;
@@ -221,6 +222,9 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
     private TextView trafficInfo;
 
     PdfDocument pdfDocument = new PdfDocument();
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -607,6 +611,8 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
         numeroFichas(); //limites de ficha actualizado desde inter quitar para publcar
 
         // taskrouter.execute();
+
+
 
     }
 
