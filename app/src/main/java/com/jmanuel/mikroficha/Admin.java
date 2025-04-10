@@ -210,7 +210,7 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
     Button btnAgregar = null;
 
     //VARIABLES DE ANUNCIO =========
-    private static final String AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917";
+    private static final String AD_UNIT_ID = "ca-app-pub-8581380224867392/9004583436";
     //"ca-app-pub-7572150509502514/4873582727"; //poriginal tienda
     //PRUEBA "ca-app-pub-3940256099942544/5224354917";
     private RewardedAd rewardedAd;
