@@ -2147,9 +2147,9 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
                     Random aleatorio = new Random();
                     String alfa;
                     if(minus_mayus.equals("mayuscula"))
-                        alfa = "ABCDEFGHIJKLMNOPQRSTVWXYZ$%&@";
+                        alfa = "ABCDEFGHIJKLMNOPQRSTVWXYZ";
                     else
-                        alfa = "abcdefghijklmnopqrstuvwxyz$%&@";
+                        alfa = "abcdefghijklmnopqrstuvwxyz";
                     String cadena = "";    //Inicializamos la Variable//
                     int numero;
                     int forma;
