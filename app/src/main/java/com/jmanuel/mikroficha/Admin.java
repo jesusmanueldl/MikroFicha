@@ -77,6 +77,7 @@ import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.slider.Slider;
 import com.google.common.reflect.TypeToken;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -222,6 +223,7 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
     private TextView trafficInfo;
 
     PdfDocument pdfDocument = new PdfDocument();
+    final int[] longitud_ficha = {7}; // valor por defecto
 
 
 
@@ -723,6 +725,25 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
         LayoutInflater inflater = getLayoutInflater();
 
         View view = inflater.inflate(R.layout.modal_agregar_ficha, null);
+        Slider sliderLongitud = view.findViewById(R.id.slider_longitud);
+        TextView textoLongitudValor = view.findViewById(R.id.texto_longitud_valor);
+
+        // Reiniciar el valor del slider y el texto
+        sliderLongitud.setValue(7); // o el valor predeterminado que tú decidas
+        longitud_ficha[0] = 7;
+        textoLongitudValor.setText("Longitud del PIN / Usuario / Contraseña: " + longitud_ficha[0]);
+
+
+        // Mostrar valor actual
+        textoLongitudValor.setText("Longitud del PIN / Usuario / Contraseña: " + longitud_ficha[0]);
+
+        // Actualizar texto dinámicamente cuando el usuario mueve el slider
+        sliderLongitud.addOnChangeListener((slider, value, fromUser) -> {
+            longitud_ficha[0] = (int) value;
+            textoLongitudValor.setText("Longitud del PIN / Usuario / Contraseña: " + longitud_ficha[0]);
+        });
+
+
         alerta.setView(view);
         EditText nfichas = view.findViewById(R.id.n_fichas);
         EditText ancho = view.findViewById(R.id.ancho);
@@ -1354,7 +1375,7 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
         title.setTextSize(tam_letra);
         marca_agua.setTextSize(tam_letra+5);
         marca_agua.setTypeface(Typeface.create(Typeface.MONOSPACE,Typeface.NORMAL));
-        marca_agua.setColor(Color.parseColor("#E8E8E8"));
+        marca_agua.setColor(Color.parseColor("#bababa"));
 
         int dx = anchoFicha * calculo + ESPACIADO, dy= altoFicha * calculo + ESPACIADO;//dx dy tamaño de la ficha el 32 es un valor calcualdo
         int lx = 0,ly = 0; //
@@ -2147,9 +2168,9 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
                     Random aleatorio = new Random();
                     String alfa;
                     if(minus_mayus.equals("mayuscula"))
-                        alfa = "ABCDEFGHIJKLMNOPQRSTVWXYZ";
+                        alfa = "ABCDEFGHIJKLMNOPQRSTVWXYZ23456789";
                     else
-                        alfa = "abcdefghijklmnopqrstuvwxyz";
+                        alfa = "abcdefghijklmnopqrstuvwxyz23456789";
                     String cadena = "";    //Inicializamos la Variable//
                     int numero;
                     int forma;
@@ -2159,20 +2180,14 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
                     while(i < maximo) {
                         cadena = "";
 
-                        cadena += alfa.charAt(aleatorio.nextInt(alfa.length()));
-                        cadena += alfa.charAt(aleatorio.nextInt(alfa.length()));
-                        cadena += alfa.charAt(aleatorio.nextInt(alfa.length()));
-
-                        int num = aleatorio.nextInt(100); // de 0 a 99
-                        String numeroFormateado = String.valueOf(num);
-
-                        // Si el número tiene menos de 3 dígitos, rellenamos con números aleatorios
-                        while (numeroFormateado.length() < 3) {
-                            int digitoAleatorio = aleatorio.nextInt(10); // del 0 al 9
-                            numeroFormateado = digitoAleatorio + numeroFormateado;
+                        // Construir la cadena de forma aleatoria según la longitud elegida
+                        for (int j = 0; j < longitud_ficha[0]; j++) {
+                            cadena += alfa.charAt(aleatorio.nextInt(alfa.length()));
+                        }
+                        if (lista_fichas_pdf.contains(cadena)) {
+                            continue; // Repetida, intenta otra
                         }
 
-                        cadena += numeroFormateado;
                         String usuario = cadena;
                         String contrasenia = cadena;
 
