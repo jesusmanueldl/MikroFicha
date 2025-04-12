@@ -9,6 +9,7 @@
     <string name="nombre_canal">Notificación Activo</string>
     <string name="canal_id">canal_basico</string>
     <string name="canal_id_descrip">Canal para usuarios activos</string>
+    <string name="default_web_client_id">1066139154179-8gmpirfrrr6da7u9ufnei51ens3305qe.apps.googleusercontent.com</string>
 
 
 </resources>

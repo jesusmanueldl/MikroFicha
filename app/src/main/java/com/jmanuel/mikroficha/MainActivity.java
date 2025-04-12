@@ -1,6 +1,7 @@
 package com.jmanuel.mikroficha;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
@@ -22,6 +23,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 /*
@@ -46,6 +48,8 @@ import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
 import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.UpdateAvailability;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -77,6 +81,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import com.bumptech.glide.Glide;
 
 import android.Manifest;
 import android.app.NotificationManager;
@@ -138,7 +143,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         // Verificar y pedir permiso para notificaciones en Android 13+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -407,19 +411,75 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main_tyc,menu);
-        return super.onCreateOptionsMenu(menu);
+        MenuItem profileItem = menu.findItem(R.id.profile);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null && user.getPhotoUrl() != null) {
+            Uri photoUri = user.getPhotoUrl();
+
+            Glide.with(this)
+                    .asBitmap()
+                    .load(photoUri)
+                    .circleCrop()
+                    .into(new com.bumptech.glide.request.target.CustomTarget<android.graphics.Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull android.graphics.Bitmap resource, @Nullable com.bumptech.glide.request.transition.Transition<? super android.graphics.Bitmap> transition) {
+                            profileItem.setIcon(new android.graphics.drawable.BitmapDrawable(getResources(), resource));
+                        }
+
+                        @Override
+                        public void onLoadCleared(@Nullable android.graphics.drawable.Drawable placeholder) { }
+                    });
+        }
+
+        return true;
     }
 
 
-    @Override
+    @Overridese crearon
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.terycond:
-                startActivity(new Intent(MainActivity.this, TerConPoli.class));
-                finish();
-                break;
+        if (item.getItemId() == R.id.profile) {
+            View view = findViewById(R.id.profile);
+            showPopupMenu(view);
+            return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showPopupMenu(View anchor) {
+        PopupMenu popup = new PopupMenu(this, anchor);
+        popup.getMenu().add(Menu.NONE, 1, 1, "T y C de uso");
+        popup.getMenu().add(Menu.NONE, 2, 2, "Cerrar sesión");
+
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case 1:
+                    startActivity(new Intent(this, TerConPoli.class));
+                    return true;
+                case 2:
+                    cerrarSesion();
+                    return true;
+            }
+            return false;
+        });
+
+        popup.show();
+    }
+
+    private void cerrarSesion() {
+        // Cerrar sesión Firebase
+        com.google.firebase.auth.FirebaseAuth.getInstance().signOut();
+
+        // Limpiar preferencias si es necesario
+        SharedPreferences.Editor editor = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE).edit();
+        editor.clear();
+        editor.apply();
+
+        // Ir al login
+        Intent intent = new Intent(MainActivity.this, activity_login.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     @Override

@@ -15,7 +15,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "1066139154179-oejcj929ujn893pgmchhlppcv5h2t79a.apps.googleusercontent.com",
+          "client_id": "1066139154179-4hh28chbdme27keq0tmr5re7307h8ehp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jmanuel.mikroficha",
+            "certificate_hash": "40f2a3b0862d6037316a490e9d95687e99795dd9"
+          }
+        },
+        {
+          "client_id": "1066139154179-8gmpirfrrr6da7u9ufnei51ens3305qe.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -28,7 +36,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1066139154179-oejcj929ujn893pgmchhlppcv5h2t79a.apps.googleusercontent.com",
+              "client_id": "1066139154179-8gmpirfrrr6da7u9ufnei51ens3305qe.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

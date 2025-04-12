@@ -11,11 +11,9 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission
-        android:name="android.permission.BLUETOOTH"
+    <uses-permission android:name="android.permission.BLUETOOTH"
         android:maxSdkVersion="30" />
-    <uses-permission
-        android:name="android.permission.BLUETOOTH_ADMIN"
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
         android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
@@ -34,11 +32,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MikroFicha"
         tools:targetApi="31">
+
         <activity
             android:name=".activity_chat"
-            android:label="MikroBot 🤖"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:label="MikroBot 🤖"
+            android:screenOrientation="portrait" />
 
         <property
             android:name="android.adservices.AD_SERVICES_CONFIG"
@@ -105,12 +104,16 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="MikroFicha"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activity_login"
+            android:exported="true"
+            android:label="Iniciar sesión"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
-
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
