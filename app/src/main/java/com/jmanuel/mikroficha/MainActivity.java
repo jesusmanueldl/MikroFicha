@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -448,8 +449,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
     private void showPopupMenu(View anchor) {
         PopupMenu popup = new PopupMenu(this, anchor);
-        popup.getMenu().add(Menu.NONE, 1, 1, "T y C de uso");
-        popup.getMenu().add(Menu.NONE, 2, 2, "Cerrar sesión");
+        popup.getMenu().add(Menu.NONE, 1, 1, "\uD83D\uDCDC T y C de uso");
+        popup.getMenu().add(Menu.NONE, 2, 2, "\uD83D\uDD12 Cerrar sesión");
+        popup.getMenu().add(Menu.NONE, 3, 3, "\uD83D\uDCF5 Eliminar cuenta");
 
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
@@ -459,12 +461,43 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 case 2:
                     cerrarSesion();
                     return true;
+                case 3:
+                    confirmarEliminacionCuenta();
+                    return true;
             }
             return false;
         });
 
         popup.show();
     }
+
+    private void confirmarEliminacionCuenta() {
+        new AlertDialog.Builder(this)
+                .setTitle("¿Eliminar cuenta?")
+                .setMessage("Esta acción eliminará tu cuenta de la App Mikroficha y no podrás recuperar tu acceso a menos que inicies sesión de nuevo con Google. ¿Deseas continuar?")
+                .setPositiveButton("Sí, eliminar", (dialog, which) -> eliminarCuentaFirebase())
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private void eliminarCuentaFirebase() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            user.delete()
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(this, "Tu cuenta fue eliminada", Toast.LENGTH_LONG).show();
+                        FirebaseAuth.getInstance().signOut();
+                        startActivity(new Intent(this, activity_login.class));
+                        finish();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "No se pudo eliminar la cuenta: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    });
+        }
+    }
+
+
+
 
     private void cerrarSesion() {
         // Cerrar sesión Firebase

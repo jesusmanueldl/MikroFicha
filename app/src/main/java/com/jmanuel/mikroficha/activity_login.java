@@ -1,19 +1,11 @@
 package com.jmanuel.mikroficha;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.Log;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -33,7 +25,6 @@ public class activity_login extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private SignInButton btnGoogleSignIn;
-    private TextView tvRecoverAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +36,9 @@ public class activity_login extends AppCompatActivity {
         }
         setContentView(R.layout.activity_login);
 
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_login);
-
         mAuth = FirebaseAuth.getInstance();
 
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             // Usuario ya está logueado, pasa directo a MainActivity
             startActivity(new Intent(this, MainActivity.class));
@@ -58,27 +46,22 @@ public class activity_login extends AppCompatActivity {
         }
 
         btnGoogleSignIn = findViewById(R.id.btnGoogleSignIn);
-        tvRecoverAccount = findViewById(R.id.tvRecoverAccount);
 
         // Configura Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id)) // Este ID lo obtienes de google-services.json
+                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         btnGoogleSignIn.setOnClickListener(view -> signIn());
-
-        tvRecoverAccount.setOnClickListener(view -> showRecoverDialog());
-
     }
 
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -111,40 +94,11 @@ public class activity_login extends AppCompatActivity {
                 });
     }
 
-    private void showRecoverDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Recuperar cuenta");
-
-        final EditText emailInput = new EditText(this);
-        emailInput.setHint("Correo electrónico");
-        emailInput.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-        builder.setView(emailInput);
-
-        builder.setPositiveButton("Enviar", (dialog, which) -> {
-            String email = emailInput.getText().toString().trim();
-            if (!email.isEmpty()) {
-                mAuth.sendPasswordResetEmail(email)
-                        .addOnSuccessListener(aVoid -> {
-                            Toast.makeText(this, "Correo de recuperación enviado", Toast.LENGTH_LONG).show();
-                        })
-                        .addOnFailureListener(e -> {
-                            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                        });
-            } else {
-                Toast.makeText(this, "Escribe un correo válido", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        builder.setNegativeButton("Cancelar", null);
-        builder.show();
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            // Usuario ya está logueado, va directo al Main
             startActivity(new Intent(this, MainActivity.class));
             finish();
         }
