@@ -104,7 +104,7 @@ public class ScriptAdminHotspot extends AppCompatActivity implements PopupMenu.O
         });
         RecyclerView mrecyclerview = findViewById(R.id.recycler_script);
 
-        mrecyclerview.setHasFixedSize(true);
+       // mrecyclerview.setHasFixedSize(true);
         mrecyclerview.setLayoutManager(new LinearLayoutManager(this));
         mrecyclerview.setAdapter(scriptHotspotAdapter);
 

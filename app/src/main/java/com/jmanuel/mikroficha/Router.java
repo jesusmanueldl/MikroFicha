@@ -58,6 +58,7 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.common.reflect.TypeToken;
+import com.google.firebase.BuildConfig;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -169,7 +170,7 @@ public class Router extends AppCompatActivity implements PopupMenu.OnMenuItemCli
         });
         RecyclerView mrecyclerview = findViewById(R.id.recycler_mk);
         numeroRouter(); //quitar cmentario para publicar
-        mrecyclerview.setHasFixedSize(true);
+        //mrecyclerview.setHasFixedSize(true);
         mrecyclerview.setLayoutManager(new LinearLayoutManager(this));
         mrecyclerview.setAdapter(routerAdapter);
 
@@ -406,7 +407,7 @@ public class Router extends AppCompatActivity implements PopupMenu.OnMenuItemCli
                 scrollscan = view.findViewById(R.id.scrollscan);
                 progressBarWifi = view.findViewById(R.id.progressBarWifi);
 
-                recyclerViewwifi.setHasFixedSize(true);
+                //recyclerViewwifi.setHasFixedSize(true);
                 recyclerViewwifi.setLayoutManager(new LinearLayoutManager(this));
                 recyclerViewwifi.setAdapter(wifiScanAdapter);
 
@@ -466,7 +467,7 @@ public class Router extends AppCompatActivity implements PopupMenu.OnMenuItemCli
         }
 
     }
-
+/*
     private void scanWifiNetworks() {
          // Escanear redes Wi-Fi
 
@@ -527,7 +528,7 @@ public class Router extends AppCompatActivity implements PopupMenu.OnMenuItemCli
         }
 
      }
-
+*/
      @Override
      public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
          super.onRequestPermissionsResult(requestCode, permissions, grantResults);

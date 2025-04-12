@@ -60,7 +60,7 @@ public class UsuarioActivo extends AppCompatActivity implements PopupMenu.OnMenu
         });
         RecyclerView mrecyclerview = findViewById(R.id.recycler_usuario_activo);
 
-        mrecyclerview.setHasFixedSize(true);
+        //mrecyclerview.setHasFixedSize(true);
         mrecyclerview.setLayoutManager(new LinearLayoutManager(this));
         mrecyclerview.setAdapter(usuariosActivoAdapter);
 
