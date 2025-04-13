@@ -20,12 +20,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 /*
 import com.google.android.gms.ads.MobileAds;
@@ -49,6 +52,7 @@ import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
 import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.UpdateAvailability;
+import com.google.firebase.BuildConfig;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -177,6 +181,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             e.printStackTrace();
         }
         version_app = pi.versionCode;
+        String version_name = pi.versionName;
         mostrarBoton = 1;
         mostrar_mikrobot = false;
 
@@ -204,12 +209,46 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             @Override
             public void onClick(View view) {
 
-                prefences = MainActivity.this.getSharedPreferences("clave_uuid_app",Context.MODE_PRIVATE);
-                uuid_app = prefences.getString("uuid_app","N/A");
+                prefences = MainActivity.this.getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
+                uuid_app = prefences.getString("uuid_app", "N/A");
+
+                // Asegúrate que estas variables estén definidas antes (ya lo están)
+                // version_name, version_app, proxima_renov
+
+                TextView mensaje = new TextView(MainActivity.this);
+                mensaje.setText(Html.fromHtml(
+                        "¡Hola!, ¿Cómo estás? Espero que mi app te ayude mucho. Gracias por formar parte de la comunidad MikroFicha.<br><br>" +
+                                "<b>Autor:</b> J. Manuel<br>" +
+                                "<b>Contacto:</b> <a href='https://facebook.com/mikroficha'>facebook.com/mikroficha</a><br>" +
+                                "<b>E-mail:</b> <a href='mailto:hola@mikroficha.com'>hola@mikroficha.com</a><br>" +
+                                "<b>Web:</b> <a href='https://mikroficha.com'>mikroficha.com</a><br>" +
+                                "<b>Telegram:</b> <a href='https://t.me/Mikroficha'>t.me/Mikroficha</a><br><br>" +
+                                "\uD83D\uDD11 <b>UUID_APP:</b> " + uuid_app + "<br><br>" +
+                                proxima_renov.replace("\n", "<br>") + "<br><br>" +
+                                "<b>Ver:</b> " + version_name + "/" + version_app
+                ));
+                mensaje.setMovementMethod(LinkMovementMethod.getInstance());
+                mensaje.setTextIsSelectable(true);
+                mensaje.setPadding(40, 40, 40, 40);
+                mensaje.setTextSize(16);
+
+// Cambiar color de texto según tema
+                int colorTexto;
+                int colorLink;
+                if ((getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                        == android.content.res.Configuration.UI_MODE_NIGHT_YES) {
+                    colorTexto = getResources().getColor(android.R.color.white, getTheme());
+                    colorLink = getResources().getColor(android.R.color.holo_blue_light, getTheme());
+                } else {
+                    colorTexto = getResources().getColor(android.R.color.black, getTheme());
+                    colorLink = getResources().getColor(android.R.color.holo_blue_dark, getTheme());
+                }
+
+                mensaje.setTextColor(colorTexto);
+                mensaje.setLinkTextColor(colorLink);
+
                 androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this);
-                builder.setMessage("¡Hola!, Cómo estas, espero que mi app te ayude mucho, gracias por formar parte de la comunidad MikroFicha.\n" +
-                                "\nAutor: @ J. Manuel  \nContacto: facebook.com/mikroficha\nE-mail: hola@mikroficha.com\nWeb: mikroficha.com\nTelegram: t.me/Mikroficha\n\n"+
-                                "\uD83D\uDD11 UUID_APP: "+ uuid_app+"\n\n"+proxima_renov+"\n\nVer:"+String.valueOf(BuildConfig.VERSION_NAME)+"/"+String.valueOf(BuildConfig.VERSION_CODE))
+                builder.setView(mensaje)
                         .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
@@ -890,6 +929,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                         Date currentTime = c.getTime();
                                         String last_access = date_last_access.format(currentTime);
 
+                                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
                                         if(planSub.equals("mensual_01")){
                                             plansub_c = "Mensual";
                                             datos.put("ADMOB", false);
@@ -903,6 +944,14 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                             datos.put("MAX_PLANES",p2mp);
                                             datos.put("MAX_ROUTER",p2mr);
                                             datos.put("ULT_ACCESO",last_access);
+
+                                            if (user != null) {
+                                                datos.put("CORREO", user.getEmail());
+                                                datos.put("UID", user.getUid());
+                                            } else {
+                                                datos.put("CORREO", "sin_cuenta");
+                                                datos.put("UID", "anónimo");
+                                            }
 
 
                                             Log.d("testOffer","entro en mensual");
@@ -922,6 +971,14 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                             datos.put("MAX_ROUTER",p3mr);
                                             datos.put("SCRIPTFALLA",scf);
                                             datos.put("ULT_ACCESO",last_access);
+
+                                            if (user != null) {
+                                                datos.put("CORREO", user.getEmail());
+                                                datos.put("UID", user.getUid());
+                                            } else {
+                                                datos.put("CORREO", "sin_cuenta");
+                                                datos.put("UID", "anónimo");
+                                            }
 
                                             Log.d("testOffer","entro en anual");
                                             mDatabase.child("UUID_APP").child(uuid_app).setValue(datos);
