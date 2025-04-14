@@ -306,6 +306,44 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btn_temply"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_margin="10dp"
+                app:cardElevation="15dp"
+                app:cardBackgroundColor="#FFC107"
+                app:cardCornerRadius="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <ImageView
+
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        app:srcCompat="@android:drawable/ic_menu_edit"
+                        >
+
+                    </ImageView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Temply"
+                        android:textAlignment="center"
+                        android:textColor="#FBFBFB"
+                        android:textSize="20sp"
+                        android:textStyle="bold"></TextView>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
 
         </GridLayout>
 

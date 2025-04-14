@@ -107,6 +107,12 @@
             android:screenOrientation="portrait" />
 
         <activity
+            android:name=".TemplateDesignerActivity"
+            android:exported="true"
+            android:label="Temply"
+            android:screenOrientation="portrait" />
+
+        <activity
             android:name=".activity_login"
             android:exported="true"
             android:label="Iniciar sesión"

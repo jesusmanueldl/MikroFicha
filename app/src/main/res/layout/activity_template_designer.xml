@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:id="@+id/designerScroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:id="@+id/designerContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!-- Sección de Logo y opciones generales -->
+            <TextView
+                android:id="@+id/logoLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Logo"
+                android:textSize="16sp"
+                android:layout_marginTop="8dp" />
+
+            <ImageView
+                android:id="@+id/logoPreview"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:scaleType="centerCrop"
+                android:layout_gravity="center"
+                android:src="@drawable/logo_ticket" />
+
+            <Button
+                android:id="@+id/selectLogoButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Seleccionar Logo"
+                android:layout_gravity="center"
+                android:layout_marginTop="4dp" />
+
+            <!-- Opciones para el logo -->
+
+            <TextView
+                android:id="@+id/logoPropertiesLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Propiedades del Logo"
+                android:textSize="16sp"
+                android:layout_marginTop="16dp" />
+
+            <EditText
+                android:id="@+id/logoWidthEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Ancho (ej. 150px)"
+                android:inputType="text" />
+
+            <EditText
+                android:id="@+id/logoHeightEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Alto (ej. auto o 150px)"
+                android:inputType="text" />
+
+            <TextView
+                android:id="@+id/logoBorderRadiusLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Redondeo del Logo (px)"
+                android:layout_marginTop="16dp" />
+
+            <SeekBar
+                android:id="@+id/seekBarLogoBorderRadius"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:progress="0" />
+
+            <!-- Opciones para el fondo -->
+            <TextView
+                android:id="@+id/fondoLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fondo"
+                android:textSize="16sp"
+                android:layout_marginTop="16dp" />
+
+            <!-- Selección de dos colores (Color 1 y Color 2) -->
+            <LinearLayout
+                android:id="@+id/colorSelectorsLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/color1Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Color 1:" />
+
+                <Button
+                    android:id="@+id/color1Picker"
+                    android:layout_width="111dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:text="Elegir Color 1" />
+
+                <TextView
+                    android:id="@+id/color2Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="   Color 2:"
+                    android:layout_marginLeft="16dp" />
+
+                <Button
+                    android:id="@+id/color2Picker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Elegir Color 2"
+                    android:layout_marginLeft="8dp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/orientationLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Orientación del degradado"
+                android:layout_marginTop="16dp" />
+
+            <Spinner
+                android:id="@+id/spinnerOrientation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Edición de Textos -->
+            <EditText
+                android:id="@+id/titleText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Título (ej. Login)"
+                android:layout_marginTop="16dp" />
+
+            <EditText
+                android:id="@+id/usernameHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Texto del campo usuario (ej. Usuario)"
+                android:layout_marginTop="8dp" />
+
+            <EditText
+                android:id="@+id/passwordHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="Texto del campo contraseña (ej. Contraseña)" />
+
+            <!-- Opción para ocultar la contraseña -->
+            <TextView
+                android:id="@+id/hidePasswordLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ocultar contraseña:"
+                android:layout_marginTop="16dp" />
+
+            <RadioGroup
+                android:id="@+id/radioGroupHidePassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radioHideNo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No"
+                    android:checked="true" />
+
+                <RadioButton
+                    android:id="@+id/radioHideYes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sí" />
+            </RadioGroup>
+
+            <!-- Mensaje informativo -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Oculta la contraseña para usar solo con PIN"
+                android:padding="8dp"
+                android:background="#FFC4F3"
+                android:textColor="#757575"
+                android:layout_marginTop="4dp" />
+
+
+            <EditText
+                android:id="@+id/footerText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Texto del pie de página"
+                android:layout_marginTop="8dp" />
+
+            <!-- Personalización del formulario -->
+            <TextView
+                android:id="@+id/inputFontSizeLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tamaño de fuente para inputs (ej. 14px)"
+                android:layout_marginTop="16dp" />
+
+
+            <EditText
+                android:id="@+id/inputFontSizeEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="14px"/>
+
+            <TextView
+                android:id="@+id/inputPaddingLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Padding para inputs (ej. 10px)"
+                android:layout_marginTop="8dp" />
+
+            <EditText
+                android:id="@+id/inputPaddingEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="10px"/>
+
+            <TextView
+                android:id="@+id/inputMarginLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Margen para inputs (ej. 5px)"
+                android:layout_marginTop="8dp" />
+
+            <EditText
+                android:id="@+id/inputMarginEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="5px"/>
+
+            <TextView
+                android:id="@+id/formBgColorLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Color de fondo del formulario"
+                android:layout_marginTop="8dp" />
+
+            <Button
+                android:id="@+id/formBgColorPicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Elegir color de fondo"
+                android:layout_marginTop="4dp"/>
+
+            <!-- Control para redondear las esquinas del formulario -->
+            <TextView
+                android:id="@+id/formBorderRadiusLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Redondeo del formulario (px)"
+                android:layout_marginTop="16dp" />
+
+            <SeekBar
+                android:id="@+id/seekBarFormBorderRadius"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:progress="0" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Grosor del borde (px)"
+                android:layout_marginTop="16dp" />
+
+            <SeekBar
+                android:id="@+id/seekBarBorderWidth"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="10"
+                android:progress="1"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Color del Borde"
+                android:layout_marginTop="8dp" />
+
+            <Button
+                android:id="@+id/formBorderColorPicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Elegir color borde"/>
+
+            <Spinner
+                android:id="@+id/spinnerBorderStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <!-- Control para ajustar el desplazamiento vertical del formulario -->
+            <TextView
+                android:id="@+id/verticalOffsetLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Desplazamiento Vertical (ej. 50px o -20px)"
+                android:layout_marginTop="16dp" />
+
+            <EditText
+                android:id="@+id/verticalOffsetEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="50px"
+                android:inputType="text" />
+
+            <!-- SeekBar para ajustar el ancho del formulario -->
+            <TextView
+                android:id="@+id/formWidthLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ancho del Formulario (px)"
+                android:layout_marginTop="16dp" />
+
+            <SeekBar
+                android:id="@+id/seekBarFormWidth"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="800"
+                android:progress="650" />
+
+            <!-- SeekBar para ajustar el alto del formulario -->
+            <TextView
+                android:id="@+id/formHeightLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Alto del Formulario (px)"
+                android:layout_marginTop="16dp" />
+
+            <SeekBar
+                android:id="@+id/seekBarFormHeight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="600"
+                android:progress="400" />
+
+
+
+            <!-- Control para redondear el botón -->
+
+            <TextView
+                android:id="@+id/buttonColorLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Color del Botón"
+                android:layout_marginTop="16dp" />
+
+            <Button
+                android:id="@+id/buttonColorPicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Elegir color del botón"
+                android:layout_marginTop="4dp" />
+
+            <!-- Selección del color del texto del botón -->
+            <TextView
+                android:id="@+id/buttonTextColorLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Color del texto del botón"
+                android:layout_marginTop="16dp" />
+
+            <Button
+                android:id="@+id/buttonTextColorPicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Elegir color del texto del botón"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/buttonBorderRadiusLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Redondeo del Botón (px)"
+                android:layout_marginTop="16dp" />
+
+            <SeekBar
+                android:id="@+id/seekBarButtonBorderRadius"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:progress="4" />
+
+
+
+
+
+
+
+
+            <!-- Vista previa -->
+            <TextView
+                android:id="@+id/previewLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vista previa"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp" />
+
+            <WebView
+                android:id="@+id/previewWebView"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginTop="4dp" />
+
+            <!-- Botón para exportar la plantilla -->
+            <Button
+                android:id="@+id/exportButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Exportar Plantilla"
+                android:layout_marginTop="16dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

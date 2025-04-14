@@ -103,6 +103,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
     private CardView btn_utileria;
     private CardView btn_chatbot;
+
+    private CardView btn_temply;
     private ImageCarousel carousel;
     int version_app;
     private int mostrarBoton;
@@ -193,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         btn_youtube = findViewById(R.id.btn_youtube_main);
         btn_utileria = findViewById(R.id.btn_utileria_main);
         btn_chatbot = findViewById(R.id.btn_gpt);
+        btn_temply = findViewById(R.id.btn_temply);
 
         btn_router.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -314,6 +317,15 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             public void onClick(View view) {
 
                 startActivity(new Intent(MainActivity.this, activity_chat.class));
+                finish();
+            }
+        });
+
+        btn_temply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                startActivity(new Intent(MainActivity.this, TemplateDesignerActivity.class));
                 finish();
             }
         });
