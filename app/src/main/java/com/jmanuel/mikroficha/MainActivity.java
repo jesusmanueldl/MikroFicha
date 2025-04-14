@@ -705,6 +705,10 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     }
 
     private void mostrarMensaje() {
+        // Verificar si la Activity ya está finalizada o en proceso de destrucción
+        if (isFinishing() || isDestroyed()) {
+            return;
+        }
         FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
         String nversion = remoteConfig.getString("versioncode");
         String nuevobotonmostrar = remoteConfig.getString("mostrarbotonentrar");
