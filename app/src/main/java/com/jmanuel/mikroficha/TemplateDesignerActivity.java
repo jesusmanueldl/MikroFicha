@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -67,6 +68,10 @@ public class TemplateDesignerActivity extends AppCompatActivity {
     // Modelo que almacena la configuración de la plantilla
     private Template currentTemplate = new Template();
 
+    private String editedHtml = ""; // Variable para guardar el html modificado
+
+    private boolean manualHtmlMode = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -120,6 +125,10 @@ public class TemplateDesignerActivity extends AppCompatActivity {
             if (!hasFocus) {
                 String width = logoWidthEdit.getText().toString().trim();
                 if (!width.isEmpty()) {
+                    // Si no se encuentra 'px' ni '%', se asume píxeles.
+                    if (!width.matches(".*(px|%)$")) {
+                        width = width + "px";
+                    }
                     currentTemplate.setLogoWidth(width);
                     updatePreview();
                 }
@@ -129,7 +138,11 @@ public class TemplateDesignerActivity extends AppCompatActivity {
             if (!hasFocus) {
                 String height = logoHeightEdit.getText().toString().trim();
                 if (!height.isEmpty()) {
-                    currentTemplate.setLogoHeight(height);
+                    // Si no se encuentra 'px' ni '%', se asume píxeles.
+                    if (!height.matches(".*(px|%)$")) {
+                        height = height + "px";
+                    }
+                    currentTemplate.setLogoWidth(height);
                     updatePreview();
                 }
             }
@@ -151,6 +164,10 @@ public class TemplateDesignerActivity extends AppCompatActivity {
             if (!hasFocus) {
                 String fontSize = inputFontSizeEdit.getText().toString().trim();
                 if (!fontSize.isEmpty()) {
+                    // Si no se encuentra 'px' ni '%', se asume píxeles.
+                    if (!fontSize.matches(".*(px|%)$")) {
+                        fontSize = fontSize + "px";
+                    }
                     currentTemplate.setInputFontSize(fontSize);
                     updatePreview();
                 }
@@ -160,6 +177,10 @@ public class TemplateDesignerActivity extends AppCompatActivity {
             if (!hasFocus) {
                 String padding = inputPaddingEdit.getText().toString().trim();
                 if (!padding.isEmpty()) {
+                    // Si no se encuentra 'px' ni '%', se asume píxeles.
+                    if (!padding.matches(".*(px|%)$")) {
+                        padding = padding + "px";
+                    }
                     currentTemplate.setInputPadding(padding);
                     updatePreview();
                 }
@@ -169,6 +190,10 @@ public class TemplateDesignerActivity extends AppCompatActivity {
             if (!hasFocus) {
                 String margin = inputMarginEdit.getText().toString().trim();
                 if (!margin.isEmpty()) {
+                    // Si no se encuentra 'px' ni '%', se asume píxeles.
+                    if (!margin.matches(".*(px|%)$")) {
+                        margin = margin + "px";
+                    }
                     currentTemplate.setInputMargin(margin);
                     updatePreview();
                 }
@@ -218,6 +243,10 @@ public class TemplateDesignerActivity extends AppCompatActivity {
             if (!hasFocus) {
                 String offset = verticalOffsetEdit.getText().toString().trim();
                 if (!offset.isEmpty()) {
+                    // Si no se encuentra 'px' ni '%', se asume píxeles.
+                    if (!offset.matches(".*(px|%)$")) {
+                        offset = offset + "px";
+                    }
                     currentTemplate.setVerticalOffset(offset);
                     updatePreview();
                 }
@@ -231,6 +260,22 @@ public class TemplateDesignerActivity extends AppCompatActivity {
         previewWebView.getSettings().setLoadWithOverviewMode(true);
         previewWebView.getSettings().setUseWideViewPort(true);
         previewWebView.setInitialScale(50);
+
+        previewWebView.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                case MotionEvent.ACTION_MOVE:
+                    // Pídele al padre que no intercepte el evento
+                    v.getParent().requestDisallowInterceptTouchEvent(true);
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    // Cuando sueltas el dedo, el padre puede volver a interceptar
+                    v.getParent().requestDisallowInterceptTouchEvent(false);
+                    break;
+            }
+            return false; // Permite que la WebView maneje su propio scroll
+        });
 
 
 
@@ -273,10 +318,28 @@ public class TemplateDesignerActivity extends AppCompatActivity {
         // Listeners para los EditText de textos
         titleText.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
-                currentTemplate.setTitleText(titleText.getText().toString());
-                updatePreview();
+                if (manualHtmlMode) {  // Si el usuario está en modo manual, preguntar si se desea sincronizar
+                    new AlertDialog.Builder(this)
+                            .setTitle("Sincronizar HTML")
+                            .setMessage("Se perderán los cambios manuales en el HTML y se regenerará a partir de las opciones. ¿Desea continuar?")
+                            .setPositiveButton("Sí", (dialog, which) -> {
+                                manualHtmlMode = false;
+                                editedHtml = ""; // se descarta la edición manual actual
+                                currentTemplate.setTitleText(titleText.getText().toString());
+                                updatePreview();
+                            })
+                            .setNegativeButton("No", (dialog, which) -> {
+                                // Opcional: restaurar el valor en el campo si se decide mantener el HTML manual
+                                titleText.setText(currentTemplate.getTitleText());
+                            })
+                            .show();
+                } else {
+                    currentTemplate.setTitleText(titleText.getText().toString());
+                    updatePreview();
+                }
             }
         });
+
         usernameHint.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
                 currentTemplate.setUsernameHint(usernameHint.getText().toString());
@@ -295,6 +358,22 @@ public class TemplateDesignerActivity extends AppCompatActivity {
                 updatePreview();
             }
         });
+        Button syncHtmlButton = findViewById(R.id.syncHtmlButton);
+        syncHtmlButton.setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                    .setTitle("Sincronizar HTML")
+                    .setMessage("Se perderán los cambios manuales. ¿Desea sincronizar y regenerar el HTML a partir de las opciones actuales?")
+                    .setPositiveButton("Sí", (dialog, which) -> {
+                        manualHtmlMode = false;
+                        editedHtml = "";
+                        updatePreview();
+                    })
+                    .setNegativeButton("Cancelar", null)
+                    .show();
+        });
+
+        Button editHtmlButton = findViewById(R.id.editHtmlButton);
+        editHtmlButton.setOnClickListener(v -> openEditHtmlModal());
 
         // Vincula el FloatingActionButton (FAB) para ver la vista previa modal
         FloatingActionButton fabPreview = findViewById(R.id.fabPreview);
@@ -357,6 +436,65 @@ public class TemplateDesignerActivity extends AppCompatActivity {
                 })
         );
 
+        EditText buttonWidthEdit = findViewById(R.id.buttonWidthEdit);
+        EditText buttonHeightEdit = findViewById(R.id.buttonHeightEdit);
+
+        buttonWidthEdit.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                String width = buttonWidthEdit.getText().toString().trim();
+                if (!width.isEmpty()) {
+                    // Si no se encuentra 'px' ni '%', se asume píxeles.
+                    if (!width.matches(".*(px|%)$")) {
+                        width = width + "px";
+                    }
+                    currentTemplate.setButtonWidth(width);
+                    updatePreview();
+                }
+            }
+        });
+
+        buttonHeightEdit.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                String height = buttonHeightEdit.getText().toString().trim();
+                if (!height.isEmpty()) {
+                    if (!height.matches(".*(px|%)$")) {
+                        height = height + "px";
+                    }
+                    currentTemplate.setButtonHeight(height);
+                    updatePreview();
+                }
+            }
+        });
+
+        EditText buttonTextSizeEdit = findViewById(R.id.buttonTextSizeEdit);
+
+        buttonTextSizeEdit.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                String textSize = buttonTextSizeEdit.getText().toString().trim();
+                if (!textSize.isEmpty()) {
+                    // Si no se encuentra 'px' ni '%', se asume píxeles.
+                    if (!textSize.matches(".*(px|%)$")) {
+                        textSize = textSize + "px";
+                    }
+                    currentTemplate.setButtonTextSize(textSize);
+                    updatePreview();
+                }
+            }
+        });
+
+        EditText buttonTextEdit = findViewById(R.id.buttonTextEdit);
+
+        buttonTextEdit.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                String text = buttonTextEdit.getText().toString().trim();
+                if (!text.isEmpty()) {
+                    currentTemplate.setButtonWidth(text);
+                    updatePreview();
+                }
+            }
+        });
+
+
         // Agregar esta línea en onCreate para enlazar el seekBarFormBorderRadius
         SeekBar seekBarFormBorderRadius = findViewById(R.id.seekBarFormBorderRadius);
         seekBarFormBorderRadius.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -375,13 +513,21 @@ public class TemplateDesignerActivity extends AppCompatActivity {
         // Botón para exportar la plantilla
         exportButton.setOnClickListener(v -> {
             Map<String, String> filesMap = TemplateGenerator.generateAllTemplates(currentTemplate);
-            // Llama al método pasando currentTemplate.getLogoUri() como tercer parámetro.
+            // Si el usuario ha editado el HTML manualmente, procesamos el contenido para corregir la URI del logo
+            if (manualHtmlMode && editedHtml != null && !editedHtml.isEmpty()) {
+                // Reemplaza en el HTML cualquier src que comience con "content://" por "logo.png"
+                String processedHtml = editedHtml.replaceAll("(<img\\s+[^>]*src=\")content://[^\"]+(\"[^>]*>)", "$1logo.png$2");
+                filesMap.put("login.html", processedHtml);
+            }
+
             boolean success = FilesManager.writeTemplateFiles(this, filesMap, currentTemplate.getLogoUri());
+
             if (success) {
                 Toast.makeText(this, "Plantilla exportada exitosamente.", Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(this, "Error al exportar la plantilla.", Toast.LENGTH_LONG).show();
             }
+
         });
 
         // Inicializar la vista previa con los valores por defecto
@@ -398,7 +544,10 @@ public class TemplateDesignerActivity extends AppCompatActivity {
         modalWebView.getSettings().setLoadWithOverviewMode(true);
         modalWebView.getSettings().setUseWideViewPort(true);
 
-        String htmlContent = TemplateGenerator.generateLoginHtml(currentTemplate, false);
+        // Usa el HTML editado si existe; en caso contrario, genera el HTML a partir de currentTemplate
+        String htmlContent = !editedHtml.isEmpty()
+                ? editedHtml
+                : TemplateGenerator.generateLoginHtml(currentTemplate, false);
         modalWebView.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null);
 
         // Crea el AlertDialog
@@ -414,18 +563,43 @@ public class TemplateDesignerActivity extends AppCompatActivity {
             dialog.getWindow().setWindowAnimations(0);
         }
 
-
-        // Ajustar tamaño del diálogo: ~90% del ancho, ~80% del alto
-        dialog.setOnShowListener(di -> {
-            if (dialog.getWindow() != null) {
-                int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.9);
-                int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.8);
-                dialog.getWindow().setLayout(width, height);
-            }
-        });
-
         // Muestra el diálogo
         dialog.show();
+    }
+
+
+    private void openEditHtmlModal() {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_edit_html, null);
+        EditText editHtmlCode = dialogView.findViewById(R.id.editHtmlCode);
+
+        // Obtén el HTML generado actualmente (o el que ya se editó previamente)
+        if (manualHtmlMode && !editedHtml.isEmpty()) {
+            editHtmlCode.setText(editedHtml);
+        } else {
+            editHtmlCode.setText(TemplateGenerator.generateLoginHtml(currentTemplate, false));
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Editar HTML")
+                .setView(dialogView)
+                .setPositiveButton("Guardar cambios", (dialog, which) -> {
+                    // Guarda el HTML editado y activa el modo manual
+                    editedHtml = editHtmlCode.getText().toString().trim();
+                    manualHtmlMode = true;
+                    updatePreview(); // En este caso, updatePreview usará editedHtml sin fusionar
+                })
+                .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss());
+
+        builder.create().show();
+    }
+
+
+    // Método para actualizar la vista previa usando el HTML editado
+    private void updatePreviewWithEditedHtml() {
+        if (!editedHtml.isEmpty()){
+            previewWebView.clearCache(true);
+            previewWebView.loadDataWithBaseURL(null, editedHtml, "text/html", "UTF-8", null);
+        }
     }
 
 
@@ -454,11 +628,33 @@ public class TemplateDesignerActivity extends AppCompatActivity {
 
     // Método para actualizar la vista previa en el WebView
     private void updatePreview() {
-        // Usamos false para que el HTML de la vista previa use la URI real del logo.
-        String htmlContent = TemplateGenerator.generateLoginHtml(currentTemplate, false);
+        String htmlContent;
+        if (manualHtmlMode && !editedHtml.isEmpty()){
+            // Fusiona los cambios del template en el HTML editado
+            htmlContent = updateEditedHtmlWithTemplateChanges();
+            editedHtml = htmlContent;  // Actualiza la variable para que siga representando el HTML fusionado.
+        } else {
+            htmlContent = TemplateGenerator.generateLoginHtml(currentTemplate, false);
+        }
         previewWebView.clearCache(true);
         previewWebView.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null);
     }
+
+
+    private String updateEditedHtmlWithTemplateChanges() {
+        String updated = editedHtml;
+        // Actualiza el width y height del botón en el CSS
+        // Se asume que el CSS contiene reglas como: "width: [valor];" en el selector del botón.
+        updated = updated.replaceAll("(?i)(button\\s*\\{[^}]*width:\\s*)([^;]+)(;)",
+                "$1" + currentTemplate.getButtonWidth() + "$3");
+        updated = updated.replaceAll("(?i)(button\\s*\\{[^}]*height:\\s*)([^;]+)(;)",
+                "$1" + currentTemplate.getButtonHeight() + "$3");
+        // Puedes repetir para otros campos como el alto del formulario (#box)
+        updated = updated.replaceAll("(?i)(#box\\s*\\{[^}]*height:\\s*)([^;]+)(;)",
+                "$1" + currentTemplate.getFormHeight() + "px$3");
+        return updated;
+    }
+
 
     // Método para exportar la plantilla generando los archivos y guardándolos en disco
     private void exportTemplate() {
@@ -493,6 +689,7 @@ public class TemplateDesignerActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         startActivity(new Intent(TemplateDesignerActivity.this, MainActivity.class));
         finish();
     }

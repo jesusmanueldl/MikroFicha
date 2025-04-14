@@ -5,51 +5,120 @@ package com.jmanuel.mikroficha;
  */
 public class Template {
 
-    // Configuración del fondo
-    // backgroundType puede tomar los valores:
-    // "TWO_COLORS" para fondo con dos colores (por ejemplo, uno para el body y otro para el contenedor)
-    // "GRADIENT" para un degradado lineal que combine bgColor1 y bgColor2.
+    // ---------------------------------------------------------
+    // 1. Configuración de Fondo y Degradado
+    // ---------------------------------------------------------
+    // backgroundType puede tomar valores como:
+    //   "TWO_COLORS"  para un fondo con dos colores
+    //   "GRADIENT"    para un degradado lineal entre bgColor1 y bgColor2
     private String backgroundType = "GRADIENT";
-    private String bgColor1 = "#1976D2"; // Color principal (por defecto)
-    private String bgColor2 = "#ECEFF1"; // Color secundario (por defecto)
+    private String bgColor1 = "#1976D2";   // Color principal
+    private String bgColor2 = "#ECEFF1";   // Color secundario
+    private String gradientOrientation = "to right";  // Ej: "to right", "to bottom", etc.
 
-    // Nueva propiedad para la orientación del degradado.
-    // Valores de ejemplo: "to right", "to bottom", "to left", "to top"
-    private String gradientOrientation = "to right";
+    // ---------------------------------------------------------
+    // 2. Configuración del Logo
+    // ---------------------------------------------------------
+    private String logoUri = "";           // URI de la imagen del logo
+    private String logoWidth = "150px";    // Ancho del logo (por defecto)
+    private String logoHeight = "auto";    // Alto del logo (por defecto)
+    private String logoBorderRadius = "0px";  // Redondez de las esquinas del logo
 
-    // Configuración del logo
-    private String logoUri = ""; // Almacena la URI de la imagen seleccionada
+    // ---------------------------------------------------------
+    // 3. Configuración de Colores Generales y Texto
+    // ---------------------------------------------------------
+    private String textColor = "#212121";  // Color principal del texto
+    private String buttonColor = "#1976D2";    // Color principal de los botones
 
-    // Nuevas propiedades para el logo
-    private String logoWidth = "150px";
-    private String logoHeight = "auto";
-
-    // Configuración de colores generales
-    private String buttonColor = "#1976D2";
-    private String textColor = "#212121";
-
-    // Configuración de textos
+    // ---------------------------------------------------------
+    // 4. Textos para la Interfaz
+    // ---------------------------------------------------------
     private String titleText = "Login";
     private String usernameHint = "Usuario";
     private String passwordHint = "Contraseña";
-    private String footerText = "Pie de página";
+    private String footerText = "Información adicional";
 
-    // --- Campos para personalizar el formulario ---
-    private String inputFontSize = "14px";      // Tamaño de fuente de los input
-    private String inputPadding = "10px";         // Padding de los input
-    private String inputMargin = "5px";           // Margen entre input
-    private String formBackgroundColor = "#FFFFFF"; // Color de fondo del contenedor del formulario
+    // ---------------------------------------------------------
+    // 5. Configuración del Formulario
+    // ---------------------------------------------------------
+    private String inputFontSize = "14px";          // Tamaño de fuente de los campos
+    private String inputPadding = "10px";           // Padding de los campos
+    private String inputMargin = "5px";             // Margen de los campos
+    private String formBackgroundColor = "#FFFFFF"; // Color de fondo del contenedor
+    private int formBorderWidth = 1;                // Grosor del borde en px
+    private String formBorderColor = "#000000";     // Color del borde
+    private String formBorderStyle = "solid";       // Estilo del borde (solid, dotted, dashed)
+    private String formBorderRadius = "2px";        // Curvatura de las esquinas
+    private boolean hidePassword = false;           // Para ocultar campo password y usar PIN
+    private String verticalOffset = "0px";          // Desplazamiento vertical del formulario
+    private int formWidth = 650;                    // Ancho del formulario en px
+    private int formHeight = 450;                   // Alto del formulario en px
 
-    // --- Borde del formulario ---
-    private int formBorderWidth = 1;                // Grosor en px
-    private String formBorderColor = "#000000";     // Color
-    private String formBorderStyle = "solid";       // Estilo (solid, dotted, dashed)
+    // ---------------------------------------------------------
+    // 6. Configuración de Botones
+    // ---------------------------------------------------------
+    private String buttonBorderRadius = "4px";      // Curvatura de esquinas del botón
+    private String buttonIconUri = "";              // URI del icono en el botón (opcional)
+    private String buttonTextColor = "#FFFFFF";     // Color del texto del botón
+    private String buttonWidth = "auto";            // Ancho del botón (ej. "100px" o "auto")
+    private String buttonHeight = "auto";           // Alto del botón (ej. "40px" o "auto")
+    private String buttonTextSize = "16px";         // Tamaño del texto del botón
+    private String buttonText = "Ingresar";         // Texto que se muestra en el botón
 
-    // Nueva propiedad para ajustar la altura (desplazamiento vertical) del formulario
-    private String verticalOffset = "0px"; // Por defecto: sin desplazamiento
+    // ---------------------------------------------------------
+    // Getters y Setters
+    // ---------------------------------------------------------
 
-    // Nueva propiedad para ajustar el borderauios del logo
-    private String logoBorderRadius = "0px";
+    // -- Fondo y Degradado --
+    public String getBackgroundType() {
+        return backgroundType;
+    }
+    public void setBackgroundType(String backgroundType) {
+        this.backgroundType = backgroundType;
+    }
+
+    public String getBgColor1() {
+        return bgColor1;
+    }
+    public void setBgColor1(String bgColor1) {
+        this.bgColor1 = bgColor1;
+    }
+
+    public String getBgColor2() {
+        return bgColor2;
+    }
+    public void setBgColor2(String bgColor2) {
+        this.bgColor2 = bgColor2;
+    }
+
+    public String getGradientOrientation() {
+        return gradientOrientation;
+    }
+    public void setGradientOrientation(String gradientOrientation) {
+        this.gradientOrientation = gradientOrientation;
+    }
+
+    // -- Logo --
+    public String getLogoUri() {
+        return logoUri;
+    }
+    public void setLogoUri(String logoUri) {
+        this.logoUri = logoUri;
+    }
+
+    public String getLogoWidth() {
+        return logoWidth;
+    }
+    public void setLogoWidth(String logoWidth) {
+        this.logoWidth = logoWidth;
+    }
+
+    public String getLogoHeight() {
+        return logoHeight;
+    }
+    public void setLogoHeight(String logoHeight) {
+        this.logoHeight = logoHeight;
+    }
 
     public String getLogoBorderRadius() {
         return logoBorderRadius;
@@ -58,7 +127,99 @@ public class Template {
         this.logoBorderRadius = logoBorderRadius;
     }
 
-    private String formBorderRadius = "2px";
+    // -- Colores Generales --
+    public String getTextColor() {
+        return textColor;
+    }
+    public void setTextColor(String textColor) {
+        this.textColor = textColor;
+    }
+
+    public String getButtonColor() {
+        return buttonColor;
+    }
+    public void setButtonColor(String buttonColor) {
+        this.buttonColor = buttonColor;
+    }
+
+    // -- Textos --
+    public String getTitleText() {
+        return titleText;
+    }
+    public void setTitleText(String titleText) {
+        this.titleText = titleText;
+    }
+
+    public String getUsernameHint() {
+        return usernameHint;
+    }
+    public void setUsernameHint(String usernameHint) {
+        this.usernameHint = usernameHint;
+    }
+
+    public String getPasswordHint() {
+        return passwordHint;
+    }
+    public void setPasswordHint(String passwordHint) {
+        this.passwordHint = passwordHint;
+    }
+
+    public String getFooterText() {
+        return footerText;
+    }
+    public void setFooterText(String footerText) {
+        this.footerText = footerText;
+    }
+
+    // -- Formulario --
+    public String getInputFontSize() {
+        return inputFontSize;
+    }
+    public void setInputFontSize(String inputFontSize) {
+        this.inputFontSize = inputFontSize;
+    }
+
+    public String getInputPadding() {
+        return inputPadding;
+    }
+    public void setInputPadding(String inputPadding) {
+        this.inputPadding = inputPadding;
+    }
+
+    public String getInputMargin() {
+        return inputMargin;
+    }
+    public void setInputMargin(String inputMargin) {
+        this.inputMargin = inputMargin;
+    }
+
+    public String getFormBackgroundColor() {
+        return formBackgroundColor;
+    }
+    public void setFormBackgroundColor(String formBackgroundColor) {
+        this.formBackgroundColor = formBackgroundColor;
+    }
+
+    public int getFormBorderWidth() {
+        return formBorderWidth;
+    }
+    public void setFormBorderWidth(int formBorderWidth) {
+        this.formBorderWidth = formBorderWidth;
+    }
+
+    public String getFormBorderColor() {
+        return formBorderColor;
+    }
+    public void setFormBorderColor(String formBorderColor) {
+        this.formBorderColor = formBorderColor;
+    }
+
+    public String getFormBorderStyle() {
+        return formBorderStyle;
+    }
+    public void setFormBorderStyle(String formBorderStyle) {
+        this.formBorderStyle = formBorderStyle;
+    }
 
     public String getFormBorderRadius() {
         return formBorderRadius;
@@ -67,9 +228,6 @@ public class Template {
         this.formBorderRadius = formBorderRadius;
     }
 
-    // Nueva propiedad para ocultar el password
-    private boolean hidePassword = false;
-
     public boolean isHidePassword() {
         return hidePassword;
     }
@@ -77,42 +235,12 @@ public class Template {
         this.hidePassword = hidePassword;
     }
 
-    // Nueva propiedad para redondear el botón
-    private String buttonBorderRadius = "4px"; // valor por defecto
-    // Nueva propiedad para icono en el botón (URI de la imagen)
-    private String buttonIconUri = "";
-
-    // Getters y setters para el botón
-    public String getButtonBorderRadius() {
-        return buttonBorderRadius;
+    public String getVerticalOffset() {
+        return verticalOffset;
     }
-    public void setButtonBorderRadius(String buttonBorderRadius) {
-        this.buttonBorderRadius = buttonBorderRadius;
+    public void setVerticalOffset(String verticalOffset) {
+        this.verticalOffset = verticalOffset;
     }
-
-    public String getButtonIconUri() {
-        return buttonIconUri;
-    }
-    public void setButtonIconUri(String buttonIconUri) {
-        this.buttonIconUri = buttonIconUri;
-    }
-
-    // Nueva propiedad para el color del texto del botón
-    private String buttonTextColor = "#FFFFFF";  // Valor por defecto, por ejemplo, blanco
-
-    public String getButtonTextColor() {
-        return buttonTextColor;
-    }
-
-    public void setButtonTextColor(String buttonTextColor) {
-        this.buttonTextColor = buttonTextColor;
-    }
-
-    // Nueva propiedad para el ancho del formulario (valor en px)
-    private int formWidth = 650;  // valor por defecto
-
-    // Nueva propiedad para el alto del formulario (valor en px)
-    private int formHeight = 400; // valor por defecto
 
     public int getFormWidth() {
         return formWidth;
@@ -128,148 +256,53 @@ public class Template {
         this.formHeight = formHeight;
     }
 
-    // Getters y setters
-
-    // Fondo
-    public String getBackgroundType() {
-        return backgroundType;
+    // -- Botones --
+    public String getButtonBorderRadius() {
+        return buttonBorderRadius;
     }
-    public void setBackgroundType(String backgroundType) {
-        this.backgroundType = backgroundType;
-    }
-    public String getBgColor1() {
-        return bgColor1;
-    }
-    public void setBgColor1(String bgColor1) {
-        this.bgColor1 = bgColor1;
-    }
-    public String getBgColor2() {
-        return bgColor2;
-    }
-    public void setBgColor2(String bgColor2) {
-        this.bgColor2 = bgColor2;
+    public void setButtonBorderRadius(String buttonBorderRadius) {
+        this.buttonBorderRadius = buttonBorderRadius;
     }
 
-    // Nueva propiedad para degradado
-    public String getGradientOrientation() {
-        return gradientOrientation;
+    public String getButtonIconUri() {
+        return buttonIconUri;
     }
-    public void setGradientOrientation(String gradientOrientation) {
-        this.gradientOrientation = gradientOrientation;
-    }
-
-    // Logo
-    public String getLogoUri() {
-        return logoUri;
-    }
-    public void setLogoUri(String logoUri) {
-        this.logoUri = logoUri;
-    }
-    // Nuevas propiedades para el logo
-    public String getLogoWidth() {
-        return logoWidth;
-    }
-    public void setLogoWidth(String logoWidth) {
-        this.logoWidth = logoWidth;
-    }
-    public String getLogoHeight() {
-        return logoHeight;
-    }
-    public void setLogoHeight(String logoHeight) {
-        this.logoHeight = logoHeight;
+    public void setButtonIconUri(String buttonIconUri) {
+        this.buttonIconUri = buttonIconUri;
     }
 
-    // Colores generales
-    public String getButtonColor() {
-        return buttonColor;
+    public String getButtonTextColor() {
+        return buttonTextColor;
     }
-    public void setButtonColor(String buttonColor) {
-        this.buttonColor = buttonColor;
-    }
-    public String getTextColor() {
-        return textColor;
-    }
-    public void setTextColor(String textColor) {
-        this.textColor = textColor;
+    public void setButtonTextColor(String buttonTextColor) {
+        this.buttonTextColor = buttonTextColor;
     }
 
-    // Textos
-    public String getTitleText() {
-        return titleText;
+    public String getButtonWidth() {
+        return buttonWidth;
     }
-    public void setTitleText(String titleText) {
-        this.titleText = titleText;
-    }
-    public String getUsernameHint() {
-        return usernameHint;
-    }
-    public void setUsernameHint(String usernameHint) {
-        this.usernameHint = usernameHint;
-    }
-    public String getPasswordHint() {
-        return passwordHint;
-    }
-    public void setPasswordHint(String passwordHint) {
-        this.passwordHint = passwordHint;
-    }
-    public String getFooterText() {
-        return footerText;
-    }
-    public void setFooterText(String footerText) {
-        this.footerText = footerText;
+    public void setButtonWidth(String buttonWidth) {
+        this.buttonWidth = buttonWidth;
     }
 
-    // Formulario
-    public String getInputFontSize() {
-        return inputFontSize;
+    public String getButtonHeight() {
+        return buttonHeight;
     }
-    public void setInputFontSize(String inputFontSize) {
-        this.inputFontSize = inputFontSize;
-    }
-    public String getInputPadding() {
-        return inputPadding;
-    }
-    public void setInputPadding(String inputPadding) {
-        this.inputPadding = inputPadding;
-    }
-    public String getInputMargin() {
-        return inputMargin;
-    }
-    public void setInputMargin(String inputMargin) {
-        this.inputMargin = inputMargin;
-    }
-    public String getFormBackgroundColor() {
-        return formBackgroundColor;
-    }
-    public void setFormBackgroundColor(String formBackgroundColor) {
-        this.formBackgroundColor = formBackgroundColor;
+    public void setButtonHeight(String buttonHeight) {
+        this.buttonHeight = buttonHeight;
     }
 
-    // Borde del formulario
-    public int getFormBorderWidth() {
-        return formBorderWidth;
+    public String getButtonTextSize() {
+        return buttonTextSize;
     }
-    public void setFormBorderWidth(int formBorderWidth) {
-        this.formBorderWidth = formBorderWidth;
-    }
-    public String getFormBorderColor() {
-        return formBorderColor;
-    }
-    public void setFormBorderColor(String formBorderColor) {
-        this.formBorderColor = formBorderColor;
-    }
-    public String getFormBorderStyle() {
-        return formBorderStyle;
-    }
-    public void setFormBorderStyle(String formBorderStyle) {
-        this.formBorderStyle = formBorderStyle;
+    public void setButtonTextSize(String buttonTextSize) {
+        this.buttonTextSize = buttonTextSize;
     }
 
-    // Desplazamiento vertical
-    public String getVerticalOffset() {
-        return verticalOffset;
+    public String getButtonText() {
+        return buttonText;
     }
-    public void setVerticalOffset(String verticalOffset) {
-        this.verticalOffset = verticalOffset;
+    public void setButtonText(String buttonText) {
+        this.buttonText = buttonText;
     }
 }

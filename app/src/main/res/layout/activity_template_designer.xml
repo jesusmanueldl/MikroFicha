@@ -16,7 +16,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <!-- Sección de Logo y opciones generales -->
+            <!-- Sección: Logo -->
             <TextView
                 android:id="@+id/logoLabel"
                 android:layout_width="wrap_content"
@@ -41,8 +41,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="4dp" />
 
-            <!-- Opciones para el logo -->
-
+            <!-- Propiedades del Logo -->
             <TextView
                 android:id="@+id/logoPropertiesLabel"
                 android:layout_width="wrap_content"
@@ -79,7 +78,7 @@
                 android:max="100"
                 android:progress="0" />
 
-            <!-- Opciones para el fondo -->
+            <!-- Sección: Fondo -->
             <TextView
                 android:id="@+id/fondoLabel"
                 android:layout_width="wrap_content"
@@ -88,7 +87,7 @@
                 android:textSize="16sp"
                 android:layout_marginTop="16dp" />
 
-            <!-- Selección de dos colores (Color 1 y Color 2) -->
+            <!-- Selección de Colores para Fondo -->
             <LinearLayout
                 android:id="@+id/colorSelectorsLayout"
                 android:layout_width="match_parent"
@@ -138,13 +137,21 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp" />
 
-            <!-- Edición de Textos -->
+            <!-- Sección: Formulario -->
+            <TextView
+                android:id="@+id/formularioLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Formulario"
+                android:textSize="16sp"
+                android:layout_marginTop="16dp" />
+
             <EditText
                 android:id="@+id/titleText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Título (ej. Login)"
-                android:layout_marginTop="16dp" />
+                android:layout_marginTop="8dp" />
 
             <EditText
                 android:id="@+id/usernameHint"
@@ -157,10 +164,10 @@
                 android:id="@+id/passwordHint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:hint="Texto del campo contraseña (ej. Contraseña)" />
+                android:hint="Texto del campo contraseña (ej. Contraseña)"
+                android:layout_marginTop="8dp" />
 
-            <!-- Opción para ocultar la contraseña -->
+            <!-- Opción para Ocultar la Contraseña -->
             <TextView
                 android:id="@+id/hidePasswordLabel"
                 android:layout_width="wrap_content"
@@ -188,7 +195,6 @@
                     android:text="Sí" />
             </RadioGroup>
 
-            <!-- Mensaje informativo -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -198,7 +204,6 @@
                 android:textColor="#757575"
                 android:layout_marginTop="4dp" />
 
-
             <EditText
                 android:id="@+id/footerText"
                 android:layout_width="match_parent"
@@ -206,46 +211,34 @@
                 android:hint="Texto del pie de página"
                 android:layout_marginTop="8dp" />
 
-            <!-- Personalización del formulario -->
+            <!-- Personalización del Formulario -->
             <TextView
-                android:id="@+id/inputFontSizeLabel"
+                android:id="@+id/personalizacionFormLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tamaño de fuente para inputs (ej. 14px)"
+                android:text="Personalización del formulario"
+                android:textSize="16sp"
                 android:layout_marginTop="16dp" />
-
 
             <EditText
                 android:id="@+id/inputFontSizeEdit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="14px"/>
-
-            <TextView
-                android:id="@+id/inputPaddingLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Padding para inputs (ej. 10px)"
-                android:layout_marginTop="8dp" />
+                android:hint="Tamaño de fuente para inputs (ej. 14px)" />
 
             <EditText
                 android:id="@+id/inputPaddingEdit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="10px"/>
-
-            <TextView
-                android:id="@+id/inputMarginLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Margen para inputs (ej. 5px)"
+                android:hint="Padding para inputs (ej. 10px)"
                 android:layout_marginTop="8dp" />
 
             <EditText
                 android:id="@+id/inputMarginEdit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="5px"/>
+                android:hint="Margen para inputs (ej. 5px)"
+                android:layout_marginTop="8dp" />
 
             <TextView
                 android:id="@+id/formBgColorLabel"
@@ -261,7 +254,7 @@
                 android:text="Elegir color de fondo"
                 android:layout_marginTop="4dp"/>
 
-            <!-- Control para redondear las esquinas del formulario -->
+            <!-- Redondeo y Bordes del Formulario -->
             <TextView
                 android:id="@+id/formBorderRadiusLabel"
                 android:layout_width="wrap_content"
@@ -275,7 +268,6 @@
                 android:layout_height="wrap_content"
                 android:max="100"
                 android:progress="0" />
-
 
             <TextView
                 android:layout_width="wrap_content"
@@ -307,7 +299,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <!-- Control para ajustar el desplazamiento vertical del formulario -->
             <TextView
                 android:id="@+id/verticalOffsetLabel"
                 android:layout_width="wrap_content"
@@ -322,7 +313,6 @@
                 android:hint="50px"
                 android:inputType="text" />
 
-            <!-- SeekBar para ajustar el ancho del formulario -->
             <TextView
                 android:id="@+id/formWidthLabel"
                 android:layout_width="wrap_content"
@@ -337,7 +327,6 @@
                 android:max="800"
                 android:progress="650" />
 
-            <!-- SeekBar para ajustar el alto del formulario -->
             <TextView
                 android:id="@+id/formHeightLabel"
                 android:layout_width="wrap_content"
@@ -352,9 +341,14 @@
                 android:max="600"
                 android:progress="400" />
 
-
-
-            <!-- Control para redondear el botón -->
+            <!-- Sección: Botones -->
+            <TextView
+                android:id="@+id/botonesLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Botones"
+                android:textSize="16sp"
+                android:layout_marginTop="16dp" />
 
             <TextView
                 android:id="@+id/buttonColorLabel"
@@ -370,7 +364,21 @@
                 android:text="Elegir color del botón"
                 android:layout_marginTop="4dp" />
 
-            <!-- Selección del color del texto del botón -->
+            <!-- Texto y estilos del botón -->
+            <EditText
+                android:id="@+id/buttonTextEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Texto del botón (ej. Ingresar)"
+                android:inputType="text" />
+
+            <EditText
+                android:id="@+id/buttonTextSizeEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Tamaño del texto del botón (ej. 16px)"
+                android:inputType="text" />
+
             <TextView
                 android:id="@+id/buttonTextColorLabel"
                 android:layout_width="wrap_content"
@@ -399,14 +407,22 @@
                 android:max="100"
                 android:progress="4" />
 
+            <!-- Tamaño del botón -->
+            <EditText
+                android:id="@+id/buttonWidthEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Ancho del botón (ej. 100px)"
+                android:inputType="text" />
 
+            <EditText
+                android:id="@+id/buttonHeightEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Alto del botón (ej. 40px)"
+                android:inputType="text" />
 
-
-
-
-
-
-            <!-- Vista previa -->
+            <!-- Sección: Vista previa y Exportación -->
             <TextView
                 android:id="@+id/previewLabel"
                 android:layout_width="wrap_content"
@@ -415,13 +431,36 @@
                 android:textStyle="bold"
                 android:layout_marginTop="16dp" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:gravity="center_horizontal">
+
+                <Button
+                    android:id="@+id/editHtmlButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Edit HTML"
+                    android:layout_marginEnd="8dp"/>
+
+                <Button
+                    android:id="@+id/syncHtmlButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Sincronizar HTML"/>
+
+            </LinearLayout>
+
             <WebView
                 android:id="@+id/previewWebView"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="400dp"
                 android:layout_marginTop="4dp" />
 
-            <!-- Botón para exportar la plantilla -->
             <Button
                 android:id="@+id/exportButton"
                 android:layout_width="match_parent"
@@ -441,9 +480,8 @@
         android:src="@android:drawable/ic_menu_view"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:backgroundTint="#FF5722"
+        app:backgroundTint="#8BC34A"
         app:tint="@android:color/white"
         app:maxImageSize="48dp"/>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

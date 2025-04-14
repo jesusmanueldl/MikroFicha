@@ -487,6 +487,24 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         return true;
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 123) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // permiso concedido
+                Toast.makeText(this, "Permiso de escritura concedido.", Toast.LENGTH_SHORT).show();
+            } else {
+                // permiso denegado
+                Toast.makeText(this, "Permiso de escritura denegado.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
+
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
