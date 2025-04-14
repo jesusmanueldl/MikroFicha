@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- styles.xml -->
+    <style name="MyWideDialogTheme" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+        <!-- Ajusta la altura y el ancho mínimos deseados -->
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+    </style>
+
+</resources>

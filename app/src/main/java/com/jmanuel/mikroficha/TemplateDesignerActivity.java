@@ -24,6 +24,8 @@ import android.webkit.WebSettings;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import yuku.ambilwarna.AmbilWarnaDialog;
 
 import java.util.Map;
@@ -294,6 +296,10 @@ public class TemplateDesignerActivity extends AppCompatActivity {
             }
         });
 
+        // Vincula el FloatingActionButton (FAB) para ver la vista previa modal
+        FloatingActionButton fabPreview = findViewById(R.id.fabPreview);
+        fabPreview.setOnClickListener(v -> openPreviewModal());
+
         // Vincular el SeekBar para ajustar el ancho del formulario
         SeekBar seekBarFormWidth = findViewById(R.id.seekBarFormWidth);
         seekBarFormWidth.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -381,6 +387,47 @@ public class TemplateDesignerActivity extends AppCompatActivity {
         // Inicializar la vista previa con los valores por defecto
         updatePreview();
     }
+
+    // Método para abrir la ventana modal de vista previa
+    private void openPreviewModal() {
+        // Infla el layout del diálogo
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_preview, null);
+        WebView modalWebView = dialogView.findViewById(R.id.modalPreviewWebView);
+        // Configura el WebView
+        modalWebView.getSettings().setJavaScriptEnabled(true);
+        modalWebView.getSettings().setLoadWithOverviewMode(true);
+        modalWebView.getSettings().setUseWideViewPort(true);
+
+        String htmlContent = TemplateGenerator.generateLoginHtml(currentTemplate, false);
+        modalWebView.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null);
+
+        // Crea el AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView)
+                .setTitle("Vista previa")
+                .setPositiveButton("CERRAR", (dialog, which) -> dialog.dismiss());
+
+        AlertDialog dialog = builder.create();
+
+        // Desactivar animaciones para evitar efecto de estiramiento
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setWindowAnimations(0);
+        }
+
+
+        // Ajustar tamaño del diálogo: ~90% del ancho, ~80% del alto
+        dialog.setOnShowListener(di -> {
+            if (dialog.getWindow() != null) {
+                int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.9);
+                int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.8);
+                dialog.getWindow().setLayout(width, height);
+            }
+        });
+
+        // Muestra el diálogo
+        dialog.show();
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
