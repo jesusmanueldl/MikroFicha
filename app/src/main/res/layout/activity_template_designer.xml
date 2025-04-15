@@ -538,6 +538,29 @@
                     android:layout_height="400dp"
                     android:layout_marginTop="4dp" />
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Una vez que hayas terminado de personalizar tu plantilla, la app te
+permite guardar el diseño generado en tu dispositivo en el directorio de
+Descargas, dentro se crea un directorio de nombre hotspot. Este
+directorio contiene todos los archivo necesario para que MikroTik lo
+utilice como plantilla de hotspot. Importante: ⚠️ Actualmente no está habilitada la opción de subir la
+plantilla directamente desde la app, por lo que debes usar Winbox para
+hacerlo."></TextView>
+
+                <TextView
+                    android:id="@+id/textViewPdfLink"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/holo_blue_dark"
+                    android:padding="16dp"
+                    android:textIsSelectable="true"
+                    android:clickable="true"
+                    android:focusable="true" />
+
                 <Button
                     android:id="@+id/exportButton"
                     android:layout_width="match_parent"

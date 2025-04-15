@@ -9,6 +9,9 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -593,6 +597,31 @@ public class TemplateDesignerActivity extends AppCompatActivity {
             intent.setType("image/*");
             startActivityForResult(intent, REQUEST_SELECT_BACKGROUND_IMAGE);
         });
+
+        TextView textView = findViewById(R.id.textViewPdfLink);
+        DatabaseReference manualRef = FirebaseDatabase.getInstance().getReference("MANUALES").child("M_TEMPLY");
+
+        manualRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String urlManual = snapshot.child("URL").getValue(String.class);
+
+                if (urlManual != null && !urlManual.isEmpty()) {
+                    String html = "<a href='" + urlManual + "'>Descargar manual en PDF</a>";
+                    textView.setMovementMethod(LinkMovementMethod.getInstance());
+                    textView.setText(Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY));
+                } else {
+                    textView.setText("Manual no disponible.");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("Firebase", "Error al leer el manual", error.toException());
+            }
+        });
+
+
 
 
 
