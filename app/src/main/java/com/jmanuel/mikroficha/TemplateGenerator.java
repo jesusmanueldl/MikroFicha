@@ -8,7 +8,7 @@ public class TemplateGenerator {
     // Genera el HTML del login a partir del objeto Template, incrustando el CSS generado inline.
     public static String generateLoginHtml(Template template, boolean isExport) {
         // Genera el CSS actual
-        String css = generateLoginCss(template);
+        String css = generateLoginCss(template, isExport);
 
         // Si exportas, la imagen de logo será "logo.png"; si no, usamos la URI real
         String logoSource;
@@ -144,7 +144,7 @@ public class TemplateGenerator {
 
         // 1. archivos "dinámicos"
         filesMap.put("login.html", generateLoginHtml(template, true));
-        filesMap.put("login.css", generateLoginCss(template));
+        filesMap.put("login.css", generateLoginCss(template, true));
 
         // 2. archivos estáticos con su contenido literal
         filesMap.put("status.html",
@@ -709,29 +709,27 @@ public class TemplateGenerator {
     }
 
 
-
-
-
-
-
     // Genera el CSS del login basado en los parámetros del Template
-    public static String generateLoginCss(Template template) {
+    public static String generateLoginCss(Template template, boolean isExport) {
         StringBuilder css = new StringBuilder();
 
         // Estilos generales para el body, centrando el contenido
-        css.append("body {\n")
-                //.append("  display: flex;\n")
-                //.append("  align-items: center;\n")
-                //.append("  justify-content: center;\n")
-                .append("  min-height: 100vh;\n")
-                .append("  margin: 0;\n")
-                .append("  padding: 20px;\n")
-                .append("  background: linear-gradient(")
-                .append(template.getGradientOrientation()).append(", ")
-                .append(template.getBgColor1()).append(", ")
-                .append(template.getBgColor2()).append(");\n")
-                .append("  color: ").append(template.getTextColor()).append(";\n")
-                .append("}\n");
+        // Fondo del body:
+        css.append("body { ");
+        if (template.getBackgroundType().equals("IMAGE") && !template.getBackgroundImageUri().isEmpty()) {
+            // En exportación se usará "background.png"; en preview la URI real
+            String bgUrl = isExport ? "background.png" : template.getBackgroundImageUri();
+            css.append("background: url('").append(bgUrl).append("') ")
+                    .append(template.getBackgroundImageRepeat()).append(" ")
+                    .append(template.getBackgroundImagePosition()).append("; ");
+            css.append("background-size: ").append(template.getBackgroundImageSize()).append("; ");
+        } else if (template.getBackgroundType().equals("GRADIENT")) {
+            css.append("background: linear-gradient(")
+                    .append(template.getGradientOrientation()).append(", ")
+                    .append(template.getBgColor1()).append(", ")
+                    .append(template.getBgColor2()).append("); ");
+        }
+        css.append("}\n");
 
         // Contenedor del formulario (#box) usando ancho relativo y max-width
         css.append("#box {\n")

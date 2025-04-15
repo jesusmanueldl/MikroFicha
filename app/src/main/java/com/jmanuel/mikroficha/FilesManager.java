@@ -3,6 +3,7 @@ package com.jmanuel.mikroficha;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Environment;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -10,11 +11,10 @@ import java.util.Map;
 
 public class FilesManager {
 
-    // Escribe los archivos de la plantilla en la carpeta de Descargas en una subcarpeta llamada "hostpot"
-    // y copia la imagen del logo (si existe) en el mismo directorio con el nombre "logo.png".
-    public static boolean writeTemplateFiles(Context context, Map<String, String> filesMap, String logoUri) {
+    // Método para escribir los archivos de la plantilla y copiar los recursos.
+    public static boolean writeTemplateFiles(Context context, Map<String, String> filesMap, String logoUri, String backgroundImageUri) {
         try {
-            // Obtener la carpeta pública de descargas
+            // Obtener la carpeta de Descargas
             File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
             // Crear la subcarpeta "hostpot"
             File exportDir = new File(downloadsDir, "hostpot");
@@ -22,7 +22,7 @@ public class FilesManager {
                 return false;
             }
 
-            // Escribir cada archivo en el directorio exportDir
+            // Escribir cada archivo generado (HTML, CSS, etc.)
             for (Map.Entry<String, String> entry : filesMap.entrySet()) {
                 File file = new File(exportDir, entry.getKey());
                 FileOutputStream fos = new FileOutputStream(file);
@@ -30,20 +30,49 @@ public class FilesManager {
                 fos.close();
             }
 
-            // Si existe una URI para el logo, copiar la imagen en el directorio exportDir como "logo.png"
+            // Copiar el logo (si existe)
             if (logoUri != null && !logoUri.isEmpty()) {
                 Uri uri = Uri.parse(logoUri);
                 InputStream is = context.getContentResolver().openInputStream(uri);
                 if (is != null) {
-                    File imageFile = new File(exportDir, "logo.png");
-                    FileOutputStream imageFos = new FileOutputStream(imageFile);
+                    File logoFile = new File(exportDir, "logo.png");
+                    FileOutputStream logoFos = new FileOutputStream(logoFile);
                     byte[] buffer = new byte[4096];
                     int len;
                     while ((len = is.read(buffer)) > 0) {
-                        imageFos.write(buffer, 0, len);
+                        logoFos.write(buffer, 0, len);
                     }
-                    imageFos.close();
+                    logoFos.close();
                     is.close();
+                }
+            }
+
+            // Copiar la imagen de fondo (si está definida)
+            if (backgroundImageUri != null && !backgroundImageUri.isEmpty()) {
+                Uri bgUri = Uri.parse(backgroundImageUri);
+                InputStream bgIs = context.getContentResolver().openInputStream(bgUri);
+                if (bgIs != null) {
+                    // Leer toda la imagen para obtener su tamaño
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[4096];
+                    int len;
+                    while ((len = bgIs.read(buffer)) > 0) {
+                        baos.write(buffer, 0, len);
+                    }
+                    bgIs.close();
+                    byte[] bgBytes = baos.toByteArray();
+
+                    // Verificar que no supere 500 KB
+                    if (bgBytes.length > (500 * 1024)) {
+                        // Opcional: mostrar mensaje de error o notificar al usuario
+                        return false;
+                    }
+
+                    // Escribir la imagen de fondo en el directorio con el nombre "background.png"
+                    File bgFile = new File(exportDir, "background.png");
+                    FileOutputStream bgFos = new FileOutputStream(bgFile);
+                    bgFos.write(bgBytes);
+                    bgFos.close();
                 }
             }
 
@@ -54,4 +83,3 @@ public class FilesManager {
         }
     }
 }
-

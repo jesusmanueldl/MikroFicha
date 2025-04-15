@@ -16,6 +16,13 @@ public class Template {
     private String bgColor2 = "#ECEFF1";   // Color secundario
     private String gradientOrientation = "to right";  // Ej: "to right", "to bottom", etc.
 
+    // Campos para fondo con imagen
+    private String backgroundImageUri = ""; // URI de la imagen de fondo
+    private String backgroundImageRepeat = "no-repeat"; // Opcional: "repeat", "repeat-x", etc.
+    private String backgroundImageSize = "cover"; // Opcional: "cover", "contain", etc.
+    private String backgroundImagePosition = "center"; // Opcional: "center", "top", "bottom", etc.
+
+
     // ---------------------------------------------------------
     // 2. Configuración del Logo
     // ---------------------------------------------------------
@@ -305,4 +312,36 @@ public class Template {
     public void setButtonText(String buttonText) {
         this.buttonText = buttonText;
     }
+
+    public String getBackgroundImageUri() {
+        return backgroundImageUri;
+    }
+
+    public void setBackgroundImageUri(String backgroundImageUri) {
+        this.backgroundImageUri = backgroundImageUri;
+    }
+
+    public String getBackgroundImageRepeat() {
+        return backgroundImageRepeat;
+    }
+    public void setBackgroundImageRepeat(String backgroundImageRepeat) {
+        this.backgroundImageRepeat = backgroundImageRepeat;
+    }
+
+    public String getBackgroundImageSize() {
+        return backgroundImageSize;
+    }
+
+    public void setBackgroundImageSize(String backgroundImageSize) {
+        this.backgroundImageSize = backgroundImageSize;
+    }
+
+    public String getBackgroundImagePosition() {
+        return backgroundImagePosition;
+    }
+    public void setBackgroundImagePosition(String backgroundImagePosition) {
+        this.backgroundImagePosition = backgroundImagePosition;
+    }
+
+
 }

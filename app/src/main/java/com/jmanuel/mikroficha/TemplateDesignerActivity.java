@@ -1,7 +1,9 @@
 package com.jmanuel.mikroficha;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -22,10 +24,22 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebSettings;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.ActionMenuItem;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import yuku.ambilwarna.AmbilWarnaDialog;
 
@@ -34,6 +48,7 @@ import java.util.Map;
 public class TemplateDesignerActivity extends AppCompatActivity {
 
     private static final int REQUEST_SELECT_LOGO = 1;
+    private boolean ADMOB = true;
 
     // Componentes de la UI
     private ImageView logoPreview;
@@ -71,11 +86,65 @@ public class TemplateDesignerActivity extends AppCompatActivity {
     private String editedHtml = ""; // Variable para guardar el html modificado
 
     private boolean manualHtmlMode = false;
+    private SharedPreferences prefences;
+    private String uuid_app;
+    private SharedPreferences router_file_pref;
+    private DatabaseReference mDatabase;
+    private AdView adview;
+    private SharedPreferences.Editor editor;
+    private static final int REQUEST_SELECT_BACKGROUND_IMAGE = 2;
+    private Button selectBackgroundImageButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_template_designer);
+
+        prefences = TemplateDesignerActivity.this.getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
+        uuid_app = prefences.getString("uuid_app","N/A");
+        ADMOB = prefences.getBoolean("ADMOB",true);
+        router_file_pref = this.getSharedPreferences("router_file", Context.MODE_PRIVATE);
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        adview = findViewById(R.id.adViewdisenio);
+
+        mDatabase.child("UUID_APP").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    if(snapshot.child(uuid_app).child("ADMOB").exists()) {
+                        prefences = TemplateDesignerActivity.this.getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
+                        editor = prefences.edit();
+                        editor.putBoolean("ADMOB", (Boolean) snapshot.child(uuid_app).child("ADMOB").getValue());
+                        editor.apply();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        //ANUNCIO de video reward
+
+        if(ADMOB) {
+            adview.setVisibility(View.VISIBLE);
+            MobileAds.initialize(this, new OnInitializationCompleteListener() {
+                @Override
+                public void onInitializationComplete(InitializationStatus initializationStatus) {
+
+                }
+            });
+            AdRequest adRequest = new AdRequest.Builder().build();
+            adview.loadAd(adRequest);
+        }
+        else {
+            adview.setVisibility(View.GONE);
+        }
+
 
         // Vincular componentes del layout
         logoPreview = findViewById(R.id.logoPreview);
@@ -393,6 +462,30 @@ public class TemplateDesignerActivity extends AppCompatActivity {
             @Override public void onStopTrackingTouch(SeekBar seekBar) { }
         });
 
+        RadioGroup radioGroupBackgroundType = findViewById(R.id.radioGroupBackgroundType);
+        radioGroupBackgroundType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+
+                if (checkedId == R.id.radioGradient) {
+                    currentTemplate.setBackgroundType("GRADIENT");
+                    currentTemplate.setBackgroundImageUri(""); // Limpia la imagen
+                    selectBackgroundImageButton.setEnabled(false);
+                    // Habilitar controles de colores si es necesario
+                    color1Picker.setEnabled(true);
+                    color2Picker.setEnabled(true);
+                } else if (checkedId == R.id.radioImage) {
+                    currentTemplate.setBackgroundType("IMAGE");
+                    selectBackgroundImageButton.setEnabled(true);
+                    // Deshabilitar controles de gradiente
+                    color1Picker.setEnabled(false);
+                    color2Picker.setEnabled(false);
+                }
+                updatePreview();
+            }
+        });
+
+
 // Vincular el SeekBar para ajustar el alto del formulario
         SeekBar seekBarFormHeight = findViewById(R.id.seekBarFormHeight);
         seekBarFormHeight.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -488,11 +581,19 @@ public class TemplateDesignerActivity extends AppCompatActivity {
             if (!hasFocus) {
                 String text = buttonTextEdit.getText().toString().trim();
                 if (!text.isEmpty()) {
-                    currentTemplate.setButtonWidth(text);
+                    currentTemplate.setButtonText(text);
                     updatePreview();
                 }
             }
         });
+
+        selectBackgroundImageButton = findViewById(R.id.selectBackgroundImageButton);
+        selectBackgroundImageButton.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            startActivityForResult(intent, REQUEST_SELECT_BACKGROUND_IMAGE);
+        });
+
 
 
         // Agregar esta línea en onCreate para enlazar el seekBarFormBorderRadius
@@ -520,7 +621,7 @@ public class TemplateDesignerActivity extends AppCompatActivity {
                 filesMap.put("login.html", processedHtml);
             }
 
-            boolean success = FilesManager.writeTemplateFiles(this, filesMap, currentTemplate.getLogoUri());
+            boolean success = FilesManager.writeTemplateFiles(this, filesMap, currentTemplate.getLogoUri(), currentTemplate.getBackgroundImageUri());
 
             if (success) {
                 Toast.makeText(this, "Plantilla exportada exitosamente.", Toast.LENGTH_LONG).show();
@@ -606,6 +707,24 @@ public class TemplateDesignerActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_SELECT_BACKGROUND_IMAGE && resultCode == RESULT_OK && data != null) {
+            Uri bgUri = data.getData();
+            if (bgUri != null) {
+                currentTemplate.setBackgroundImageUri(bgUri.toString());
+                updatePreview();
+            }
+        }
+
+        if(requestCode == REQUEST_SELECT_BACKGROUND_IMAGE && resultCode == RESULT_OK && data != null) {
+            Uri backgroundUri = data.getData();
+            // Almacena la URI como cadena en el objeto Template.
+            currentTemplate.setBackgroundImageUri(backgroundUri.toString());
+            // Opcional: cambiar backgroundType a "IMAGE"
+            currentTemplate.setBackgroundType("IMAGE");
+            updatePreview(); // Regenera la vista previa
+        }
+
         if (requestCode == REQUEST_SELECT_LOGO && resultCode == RESULT_OK && data != null) {
             Uri logoUri = data.getData();
             // Verificar el tamaño de la imagen: máximo 300KB
@@ -659,7 +778,7 @@ public class TemplateDesignerActivity extends AppCompatActivity {
     // Método para exportar la plantilla generando los archivos y guardándolos en disco
     private void exportTemplate() {
         Map<String, String> filesMap = TemplateGenerator.generateAllTemplates(currentTemplate);
-        boolean success = FilesManager.writeTemplateFiles(this, filesMap, currentTemplate.getLogoUri());
+        boolean success = FilesManager.writeTemplateFiles(this, filesMap, currentTemplate.getLogoUri(), currentTemplate.getBackgroundImageUri());
         if (success) {
             Toast.makeText(this, "Plantilla exportada exitosamente.", Toast.LENGTH_LONG).show();
         } else {
