@@ -15,10 +15,22 @@
             android:id="@+id/adViewdisenio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            ads:adSize="LEADERBOARD"
+            ads:adSize="SMART_BANNER"
             ads:adUnitId="ca-app-pub-8581380224867392/9792180792">
 
         </com.google.android.gms.ads.AdView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="EDITOR DE PLANTILLAS"
+            android:textStyle="bold"
+            android:textSize="30sp"
+            android:textColor="@color/white"
+            android:background="@drawable/gradiente_login1"
+            android:textAlignment="center"
+            android:layout_marginTop="5dp"
+             />
 
         <ScrollView
             android:id="@+id/designerScroll"
@@ -38,7 +50,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Logo"
-                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
                     android:layout_marginTop="8dp" />
 
                 <ImageView
@@ -60,10 +73,14 @@
                 <!-- Propiedades del Logo -->
                 <TextView
                     android:id="@+id/logoPropertiesLabel"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Propiedades del Logo"
-                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/gradiente_admin3"
+                    android:textAlignment="center"
                     android:layout_marginTop="16dp" />
 
                 <EditText
@@ -99,10 +116,14 @@
 
                 <TextView
                     android:id="@+id/fondoLabel"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Fondo"
-                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/gradiente_admin3"
+                    android:textAlignment="center"
                     android:layout_marginTop="16dp" />
 
                 <RadioGroup
@@ -187,10 +208,14 @@
                 <!-- Sección: Formulario -->
                 <TextView
                     android:id="@+id/formularioLabel"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Formulario"
-                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/gradiente_admin3"
+                    android:textAlignment="center"
                     android:layout_marginTop="16dp" />
 
                 <EditText
@@ -391,10 +416,14 @@
                 <!-- Sección: Botones -->
                 <TextView
                     android:id="@+id/botonesLabel"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Botones"
-                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/gradiente_admin3"
+                    android:textAlignment="center"
                     android:layout_marginTop="16dp" />
 
                 <TextView
@@ -476,6 +505,7 @@
                     android:layout_height="wrap_content"
                     android:text="Vista previa"
                     android:textStyle="bold"
+                    android:textSize="18sp"
                     android:layout_marginTop="16dp" />
 
                 <LinearLayout
@@ -498,7 +528,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Sincronizar HTML"/>
+                        android:text="Sync HTML"/>
 
                 </LinearLayout>
 

@@ -62,12 +62,6 @@ public class FilesManager {
                     bgIs.close();
                     byte[] bgBytes = baos.toByteArray();
 
-                    // Verificar que no supere 500 KB
-                    if (bgBytes.length > (500 * 1024)) {
-                        // Opcional: mostrar mensaje de error o notificar al usuario
-                        return false;
-                    }
-
                     // Escribir la imagen de fondo en el directorio con el nombre "background.png"
                     File bgFile = new File(exportDir, "background.png");
                     FileOutputStream bgFos = new FileOutputStream(bgFile);

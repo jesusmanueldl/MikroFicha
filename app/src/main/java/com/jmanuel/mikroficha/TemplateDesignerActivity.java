@@ -718,6 +718,18 @@ public class TemplateDesignerActivity extends AppCompatActivity {
 
         if(requestCode == REQUEST_SELECT_BACKGROUND_IMAGE && resultCode == RESULT_OK && data != null) {
             Uri backgroundUri = data.getData();
+            // Verificar el tamaño de la imagen: máximo 300KB
+            Cursor cursor = getContentResolver().query(backgroundUri, null, null, null, null);
+            if (cursor != null) {
+                int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                cursor.moveToFirst();
+                long size = cursor.getLong(sizeIndex);
+                cursor.close();
+                if (size > 500 * 1024) { // 300 KB
+                    Toast.makeText(this, "La imagen supera el límite de 500KB", Toast.LENGTH_LONG).show();
+                    return;
+                }
+            }
             // Almacena la URI como cadena en el objeto Template.
             currentTemplate.setBackgroundImageUri(backgroundUri.toString());
             // Opcional: cambiar backgroundType a "IMAGE"
@@ -780,7 +792,7 @@ public class TemplateDesignerActivity extends AppCompatActivity {
         Map<String, String> filesMap = TemplateGenerator.generateAllTemplates(currentTemplate);
         boolean success = FilesManager.writeTemplateFiles(this, filesMap, currentTemplate.getLogoUri(), currentTemplate.getBackgroundImageUri());
         if (success) {
-            Toast.makeText(this, "Plantilla exportada exitosamente.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Plantilla exportada exitosamente en la carpeta de descargas.", Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(this, "Error al exportar la plantilla.", Toast.LENGTH_LONG).show();
         }
