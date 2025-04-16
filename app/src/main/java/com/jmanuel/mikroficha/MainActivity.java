@@ -5,9 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
-import android.Manifest;
 import android.app.AlertDialog;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,7 +17,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.Settings;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -357,7 +354,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                         Log.d("testOffer fecha ultima", lastRunDate);
                         Log.d("testOffer plax1", TplanSub);
 
-                        if (!currentDate.equals(lastRunDate+1)) {
+                        if (!currentDate.equals(lastRunDate)) {
                             // Guarda la fecha actual en SharedPreferences
                             SharedPreferences.Editor editor = sharedPreferences_dai.edit();
                             editor.putString("lastRunDate", currentDate);
@@ -411,18 +408,12 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         });
 
         habilita_remoto_config();
-        if(ADMOB) {
+        if (adview != null && ADMOB) {
             adview.setVisibility(View.VISIBLE);
-            MobileAds.initialize(this, new OnInitializationCompleteListener() {
-                @Override
-                public void onInitializationComplete(InitializationStatus initializationStatus) {
-
-                }
-            });
+            MobileAds.initialize(this, initializationStatus -> {});
             AdRequest adRequest = new AdRequest.Builder().build();
             adview.loadAd(adRequest);
-        }
-        else {
+        } else if (adview != null) {
             adview.setVisibility(View.GONE);
         }
 
@@ -487,24 +478,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         return true;
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 123) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // permiso concedido
-                Toast.makeText(this, "Permiso de escritura concedido.", Toast.LENGTH_SHORT).show();
-            } else {
-                // permiso denegado
-                Toast.makeText(this, "Permiso de escritura denegado.", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-
-
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -563,6 +536,14 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                         Toast.makeText(this, "No se pudo eliminar la cuenta: " + e.getMessage(), Toast.LENGTH_LONG).show();
                     });
         }
+    }
+
+    private void configurarRemoteConfig(FirebaseRemoteConfig remoteConfig) {
+        long interval = BuildConfig.DEBUG ? 5 : 3600;
+        FirebaseRemoteConfigSettings frconf = new FirebaseRemoteConfigSettings.Builder()
+                .setMinimumFetchIntervalInSeconds(interval)
+                .build();
+        remoteConfig.setConfigSettingsAsync(frconf);
     }
 
 
@@ -628,10 +609,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             interval = 5;
 
         FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
-        FirebaseRemoteConfigSettings frconf = new FirebaseRemoteConfigSettings.Builder()
-                .setMinimumFetchIntervalInSeconds(interval)
-                .build();
-        remoteConfig.setConfigSettingsAsync(frconf);
+        configurarRemoteConfig(remoteConfig);
         HashMap<String,Object> actualizacion = new HashMap<>();
         actualizacion.put("versioncode",version_app);
         actualizacion.put("mostrarbotonentrar",mostrarBoton);
@@ -653,10 +631,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             interval = 5;
 
         FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
-        FirebaseRemoteConfigSettings frconf = new FirebaseRemoteConfigSettings.Builder()
-                .setMinimumFetchIntervalInSeconds(interval)
-                .build();
-        remoteConfig.setConfigSettingsAsync(frconf);
+        configurarRemoteConfig(remoteConfig);
         HashMap<String,Object> actualizacion = new HashMap<>();
         actualizacion.put("ADMOB",true);
         actualizacion.put("MIKROBOT",true);
@@ -1036,7 +1011,11 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                         editor.apply();
                                         //si no tiene subcripcion hacer algo....
                                         Log.d("testOffer", "sin suscripcion");
-                                        DatabaseReference refDatabase = FirebaseDatabase.getInstance().getReference("UUID_APP/"+uuid_app+"/CS");
+                                        DatabaseReference refDatabase = FirebaseDatabase.getInstance()
+                                                .getReference()
+                                                .child("UUID_APP")
+                                                .child(uuid_app)
+                                                .child("CS");
                                         refDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot snapshot) {

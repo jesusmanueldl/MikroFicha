@@ -4,9 +4,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.text.Html;
@@ -32,6 +34,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.ActionMenuItem;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -48,6 +52,7 @@ import com.google.firebase.database.ValueEventListener;
 import yuku.ambilwarna.AmbilWarnaDialog;
 
 import java.util.Map;
+import android.Manifest;
 
 public class TemplateDesignerActivity extends AppCompatActivity {
 
@@ -98,6 +103,8 @@ public class TemplateDesignerActivity extends AppCompatActivity {
     private SharedPreferences.Editor editor;
     private static final int REQUEST_SELECT_BACKGROUND_IMAGE = 2;
     private Button selectBackgroundImageButton;
+
+    private static final int STORAGE_PERMISSION_REQUEST_CODE = 100;
 
 
     @Override
@@ -383,9 +390,23 @@ public class TemplateDesignerActivity extends AppCompatActivity {
 
         // Botón para seleccionar logo mediante la galería
         selectLogoButton.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_PICK);
-            intent.setType("image/*");
-            startActivityForResult(intent, REQUEST_SELECT_LOGO);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_SELECT_LOGO);
+                    return; // espera a que se otorgue el permiso
+                }
+            } else {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_SELECT_LOGO);
+                    return;
+                }
+            }
+
+            abrirGaleriaLogo();
         });
 
         // Listeners para los EditText de textos
@@ -642,26 +663,51 @@ public class TemplateDesignerActivity extends AppCompatActivity {
 
         // Botón para exportar la plantilla
         exportButton.setOnClickListener(v -> {
-            Map<String, String> filesMap = TemplateGenerator.generateAllTemplates(currentTemplate);
-            // Si el usuario ha editado el HTML manualmente, procesamos el contenido para corregir la URI del logo
-            if (manualHtmlMode && editedHtml != null && !editedHtml.isEmpty()) {
-                // Reemplaza en el HTML cualquier src que comience con "content://" por "logo.png"
-                String processedHtml = editedHtml.replaceAll("(<img\\s+[^>]*src=\")content://[^\"]+(\"[^>]*>)", "$1logo.png$2");
-                filesMap.put("login.html", processedHtml);
-            }
-
-            boolean success = FilesManager.writeTemplateFiles(this, filesMap, currentTemplate.getLogoUri(), currentTemplate.getBackgroundImageUri());
-
-            if (success) {
-                Toast.makeText(this, "Plantilla exportada exitosamente.", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(this, "Error al exportar la plantilla.", Toast.LENGTH_LONG).show();
-            }
-
+            doExportTemplate();
         });
 
         // Inicializar la vista previa con los valores por defecto
         updatePreview();
+    }
+
+    private void abrirGaleriaLogo() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, REQUEST_SELECT_LOGO);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_SELECT_LOGO) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                abrirGaleriaLogo();
+            } else {
+                Toast.makeText(this, "Permiso denegado. No podrás seleccionar imágenes.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void doExportTemplate() {
+        Map<String, String> filesMap = TemplateGenerator.generateAllTemplates(currentTemplate);
+        // Si el usuario ha editado el HTML manualmente, procesamos la URI del logo
+        if (manualHtmlMode && editedHtml != null && !editedHtml.isEmpty()) {
+            String processedHtml = editedHtml
+                    .replaceAll("(<img\\s+[^>]*src=\")content://[^\"]+(\"[^>]*>)", "$1logo.png$2");
+            filesMap.put("login.html", processedHtml);
+        }
+
+        boolean success = FilesManager.writeTemplateFiles(
+                this, filesMap,
+                currentTemplate.getLogoUri(),
+                currentTemplate.getBackgroundImageUri()
+        );  // :contentReference[oaicite:0]{index=0}&#8203;:contentReference[oaicite:1]{index=1}
+
+        if (success) {
+            Toast.makeText(this, "Plantilla exportada exitosamente.", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "Error al exportar la plantilla.", Toast.LENGTH_LONG).show();
+        }
     }
 
     // Método para abrir la ventana modal de vista previa
@@ -849,7 +895,6 @@ public class TemplateDesignerActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         startActivity(new Intent(TemplateDesignerActivity.this, MainActivity.class));
         finish();
     }

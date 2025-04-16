@@ -15,7 +15,7 @@ public class FilesManager {
     public static boolean writeTemplateFiles(Context context, Map<String, String> filesMap, String logoUri, String backgroundImageUri) {
         try {
             // Obtener la carpeta de Descargas
-            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            File downloadsDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
             // Crear la subcarpeta "hostpot"
             File exportDir = new File(downloadsDir, "hostpot");
             if (!exportDir.exists() && !exportDir.mkdirs()) {

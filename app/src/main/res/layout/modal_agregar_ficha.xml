@@ -28,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:adSize="MEDIUM_RECTANGLE"
-            app:adUnitId="ca-app-pub-8581380224867392/9792180792"></com.google.android.gms.ads.AdView>
+            app:adUnitId="@string/admob_banner_id"></com.google.android.gms.ads.AdView>
 
         <TextView
             android:layout_width="match_parent"

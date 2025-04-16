@@ -618,6 +618,41 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
 
     }
 
+
+    private void verificarPermisosImagen() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_MEDIA_IMAGES}, 100);
+            }
+        } else {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 200) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permiso concedido para acceder a imágenes", Toast.LENGTH_SHORT).show();
+                abrirGaleria(); // ahora sí abre la galería
+            } else {
+                Toast.makeText(this, "Permiso denegado. No se puede cargar imagen.", Toast.LENGTH_LONG).show();
+            }
+        } else if (requestCode == 100 || requestCode == 2) {
+            cancelarCrearFicha(); // casos de Bluetooth
+        } else if (requestCode == 101) {
+            Toast.makeText(Admin.this, "Es necesario los permisos de bluetooth", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
     //ANUNCIO METODOS
     private void loadRewardedAd() {
         if (rewardedAd == null) {
@@ -704,6 +739,7 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
                     public void onUserEarnedReward(@NonNull RewardItem rewardItem) {
                         // Handle the reward.
                         completo = true;
+                        Toast.makeText(Admin.this, "¡Gracias por apoyar viendo el video!", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "The user earned the reward. completo");
                         int rewardAmount = rewardItem.getAmount();
                         String rewardType = rewardItem.getType();
@@ -888,9 +924,23 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
         carga_img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                intent.setType("image/");
-                startActivityForResult(intent.createChooser(intent, "Seleccione la aplicación"), 10);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (ContextCompat.checkSelfPermission(Admin.this, Manifest.permission.READ_MEDIA_IMAGES)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(Admin.this,
+                                new String[]{Manifest.permission.READ_MEDIA_IMAGES}, 200);
+                        return;
+                    }
+                } else {
+                    if (ContextCompat.checkSelfPermission(Admin.this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(Admin.this,
+                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 200);
+                        return;
+                    }
+                }
+
+                abrirGaleria(); // si ya tiene permisos, abrir directamente
             }
         });
 
@@ -1076,6 +1126,12 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
             }
         });
 
+    }
+
+    private void abrirGaleria() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, "Seleccione la aplicación"), 10);
     }
 
     //este metodo es cuando se presiona el boton de cancelar al momento de querer crear ficha modal
@@ -1662,8 +1718,22 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
 
     @Override
     public void onBackPressed() {
+        LayoutInflater inflater = LayoutInflater.from(Admin.this);
+        View dialogView = inflater.inflate(R.layout.dialog_salir_admin, null);
+
+        if (ADMOB) {
+            adview.setVisibility(View.VISIBLE);
+            // Inicializa el anuncio
+            AdView adView = dialogView.findViewById(R.id.adViewDialog);
+            AdRequest adRequest = new AdRequest.Builder().build();
+            adView.loadAd(adRequest);
+        } else {
+            adview.setVisibility(View.GONE);
+        }
+
+        // Construye el diálogo
         AlertDialog.Builder builder = new AlertDialog.Builder(Admin.this);
-        builder.setMessage("¿Está seguro que deseas salir?")
+        builder.setView(dialogView)
                 .setCancelable(false)
                 .setPositiveButton("Salir", new DialogInterface.OnClickListener() {
                     @Override
@@ -1683,12 +1753,11 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
                     }
                 });
 
-        AlertDialog titulo = builder.create();
-        titulo.setTitle("Salir del Admin");
+        AlertDialog dialog = builder.create();
+        dialog.setTitle("Salir del Admin");
 
-        // MUY IMPORTANTE: evita error WindowLeaked
         if (!isFinishing()) {
-            titulo.show();
+            dialog.show();
         }
     }
 

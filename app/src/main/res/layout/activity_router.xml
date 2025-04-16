@@ -14,7 +14,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="2dp"
             ads:adSize="MEDIUM_RECTANGLE"
-            ads:adUnitId="ca-app-pub-8581380224867392/9792180792">
+            ads:adUnitId="@string/admob_banner_id">
         </com.google.android.gms.ads.AdView>
 
         <androidx.recyclerview.widget.RecyclerView
