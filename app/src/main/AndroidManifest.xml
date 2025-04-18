@@ -120,6 +120,12 @@
             android:screenOrientation="portrait" />
 
         <activity
+            android:name=".RewardsActivity"
+            android:exported="false"
+            android:label="Bonos"
+            android:screenOrientation="portrait"/>
+
+        <activity
             android:name=".activity_login"
             android:exported="true"
             android:label="MikroFicha"

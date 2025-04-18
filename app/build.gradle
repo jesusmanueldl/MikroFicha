@@ -10,8 +10,8 @@ android {
         applicationId "com.jmanuel.mikroficha"
         minSdk 26
         targetSdk 34
-        versionCode 56
-        versionName "5.0"
+        versionCode 57
+        versionName "5.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -70,6 +70,7 @@ dependencies {
     implementation 'com.github.yukuku:ambilwarna:2.0.1'
 
     implementation 'com.google.android.material:material:1.12.0'
+    implementation "com.google.firebase:firebase-firestore"
 
 
 }

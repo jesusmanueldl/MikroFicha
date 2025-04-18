@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
     private CardView btn_utileria;
     private CardView btn_chatbot;
+    private CardView btn_rewards;
 
     private CardView btn_temply;
     private ImageCarousel carousel;
@@ -142,6 +143,11 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private String TplanSub = "";
     //_____________________________________________
 
+    private DatabaseReference rewardsRef =
+            FirebaseDatabase.getInstance()
+                    .getReference("REWARDS")
+                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
     private static final int REQUEST_CODE_UPDATE = 1234;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -163,7 +169,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         admob_preference = MainActivity.this.getSharedPreferences("clave_uuid_app",Context.MODE_PRIVATE);
         ADMOB = admob_preference.getBoolean("ADMOB",true);
         MIKROBOT_ON = admob_preference.getBoolean("MIKROBOT",false);
-
         if(uuid_app.equals("N/A")) {
             editor.putString("uuid_app", generarRandomUUID());
             editor.putBoolean("ADMOB", true);
@@ -172,6 +177,31 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         datos = new HashMap<>();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         adview = findViewById(R.id.adView);
+
+        rewardsRef.addValueEventListener(new ValueEventListener() {
+            @Override public void onDataChange(@NonNull DataSnapshot snap) {
+
+                // epoch‑millis – puede no existir la primera vez
+                Long until = snap.child("adsFreeUntil").getValue(Long.class);
+                boolean showAds = (until == null) || (until < System.currentTimeMillis());
+
+                // Guarda la decisión en SharedPreferences
+                editor.putBoolean("ADMOB", showAds).apply();
+                ADMOB = showAds;               // actualiza tu flag en memoria
+
+                // Aplica al banner
+                if (adview != null) {
+                    if (showAds) {
+                        adview.setVisibility(View.VISIBLE);
+                        adview.loadAd(new AdRequest.Builder().build());
+                    } else {
+                        adview.setVisibility(View.GONE);
+                    }
+                }
+            }
+            @Override public void onCancelled(@NonNull DatabaseError error) { }
+        });
+
 
         PackageInfo pi = null;
         try {
@@ -327,6 +357,10 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             }
         });
 
+        btn_rewards = findViewById(R.id.btn_rewards);
+        btn_rewards.setOnClickListener(v ->
+                        startActivity(new Intent(this, RewardsActivity.class)));
+
         mDatabase.child("PRECIOS").child("P2").child("CONF").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -408,14 +442,14 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         });
 
         habilita_remoto_config();
-        if (adview != null && ADMOB) {
+       /* if (adview != null && ADMOB) {
             adview.setVisibility(View.VISIBLE);
             MobileAds.initialize(this, initializationStatus -> {});
             AdRequest adRequest = new AdRequest.Builder().build();
             adview.loadAd(adRequest);
         } else if (adview != null) {
             adview.setVisibility(View.GONE);
-        }
+        }*/
 
         if(MIKROBOT_ON || mostrar_mikrobot) {
             btn_chatbot.setVisibility(View.VISIBLE);
@@ -635,6 +669,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         HashMap<String,Object> actualizacion = new HashMap<>();
         actualizacion.put("ADMOB",true);
         actualizacion.put("MIKROBOT",true);
+        actualizacion.put("rewards_button_enabled", true);   // ← nuevo
+
 
         remoteConfig.setDefaultsAsync(actualizacion);
         remoteConfig.fetchAndActivate()
@@ -645,6 +681,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                         editor = prefences.edit();
                         editor.putBoolean("ADMOB", (Boolean) remoteConfig.getBoolean("admob"));
                         editor.putBoolean("MIKROBOT", (Boolean) remoteConfig.getBoolean("botonmikrobot"));
+
+                        boolean showRewards = remoteConfig.getBoolean("rewards_button_enabled");
+                        editor.putBoolean("REWARDS_BTN", showRewards);
                         editor.apply();
 
                         mDatabase.child("UUID_APP").addValueEventListener(new ValueEventListener() {
@@ -688,6 +727,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         String nversion = remoteConfig.getString("versioncode");
         String nuevobotonmostrar = remoteConfig.getString("mostrarbotonentrar");
         boolean nuevobotonmikrobot = remoteConfig.getBoolean("botonmikrobot");
+
+
+
         if(nuevobotonmostrar.equals(""))
             nuevobotonmostrar = "1";
         else {
@@ -719,6 +761,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
          else {
              btn_chatbot.setVisibility(View.GONE);
          }
+
+
+
     }
 
     public String generarRandomUUID() {
