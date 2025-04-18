@@ -100,7 +100,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
     private CardView btn_utileria;
     private CardView btn_chatbot;
-    private CardView btn_rewards;
 
     private CardView btn_temply;
     private ImageCarousel carousel;
@@ -357,8 +356,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             }
         });
 
-        btn_rewards = findViewById(R.id.btn_rewards);
-        btn_rewards.setOnClickListener(v ->
+        findViewById(R.id.btn_rewards)
+                .setOnClickListener(v ->
                         startActivity(new Intent(this, RewardsActivity.class)));
 
         mDatabase.child("PRECIOS").child("P2").child("CONF").addValueEventListener(new ValueEventListener() {
@@ -669,8 +668,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         HashMap<String,Object> actualizacion = new HashMap<>();
         actualizacion.put("ADMOB",true);
         actualizacion.put("MIKROBOT",true);
-        actualizacion.put("rewards_button_enabled", true);   // ← nuevo
-
 
         remoteConfig.setDefaultsAsync(actualizacion);
         remoteConfig.fetchAndActivate()
@@ -681,9 +678,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                         editor = prefences.edit();
                         editor.putBoolean("ADMOB", (Boolean) remoteConfig.getBoolean("admob"));
                         editor.putBoolean("MIKROBOT", (Boolean) remoteConfig.getBoolean("botonmikrobot"));
-
-                        boolean showRewards = remoteConfig.getBoolean("rewards_button_enabled");
-                        editor.putBoolean("REWARDS_BTN", showRewards);
                         editor.apply();
 
                         mDatabase.child("UUID_APP").addValueEventListener(new ValueEventListener() {
@@ -727,9 +721,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         String nversion = remoteConfig.getString("versioncode");
         String nuevobotonmostrar = remoteConfig.getString("mostrarbotonentrar");
         boolean nuevobotonmikrobot = remoteConfig.getBoolean("botonmikrobot");
-
-
-
         if(nuevobotonmostrar.equals(""))
             nuevobotonmostrar = "1";
         else {
@@ -761,9 +752,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
          else {
              btn_chatbot.setVisibility(View.GONE);
          }
-
-
-
     }
 
     public String generarRandomUUID() {
