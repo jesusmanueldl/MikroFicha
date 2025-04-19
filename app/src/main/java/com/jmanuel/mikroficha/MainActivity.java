@@ -354,16 +354,18 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                         Log.d("testOffer fecha ultima", lastRunDate);
                         Log.d("testOffer plax1", TplanSub);
 
-                        if (!currentDate.equals(lastRunDate)) {
+                        checkSubcripcion();
+
+                        /*if (!currentDate.equals(lastRunDate)) {
                             // Guarda la fecha actual en SharedPreferences
                             SharedPreferences.Editor editor = sharedPreferences_dai.edit();
                             editor.putString("lastRunDate", currentDate);
                             editor.apply();
 
                             // Ejecuta la función
-                            checkSubcripcion();
 
-                        }
+
+                        }*/
                         proxima_renov ="\nRenovacion: " +lastRenewDate+" \uD83D\uDD04\n"+orderIDSub+"\n\nPlan: "+TplanSub;
                     }
                     @Override
@@ -745,24 +747,24 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     }
 
     private void checkSubcripcion(){
+        // Al inicio del método checkSubcripcion()
+        final boolean[] subscriptionActive = {false};
 
         billingClient = BillingClient.newBuilder(this).enablePendingPurchases().setListener((billingResult, list) -> {}).build();
         final BillingClient finalBillingClient = billingClient;
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
             public void onBillingServiceDisconnected() {
-
+                Log.d("testOffer", "Servicio de facturación desconectado");
             }
 
             @Override
             public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
-
                 if(billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK){
-
                     finalBillingClient.queryPurchasesAsync(
-                            QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build(),(billingResult1, list) -> {
+                            QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build(),
+                            (billingResult1, list) -> {
                                 if(billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK){
-
                                     Calendar calendar = Calendar.getInstance();
                                     Log.d("testOffer", list.size() +" elementos");
                                     String planSub = "", ordeID = "";
@@ -772,6 +774,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                     String orderId = "";
 
                                     if(list.size() > 0){
+                                        subscriptionActive[0] = true;
                                         //si tiene mas de una subscripcion verificar cual tiene
                                         int i = 0;
                                         for(Purchase purchase: list){
@@ -802,11 +805,10 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                                     Retrofit retrofit = null;
                                                     try {
                                                         retrofit = new Retrofit.Builder()
-                                                                .baseUrl("https://us-central1-mikroficha.cloudfunctions.net/getSubscriptionDetails/") // Asegúrate de reemplazar con tu URL
+                                                                .baseUrl("https://us-central1-mikroficha.cloudfunctions.net/getSubscriptionDetails/")
                                                                 .addConverterFactory(GsonConverterFactory.create())
                                                                 .build();
                                                     }catch(Exception e){Log.d("testOffer exception", "Ex"+e.getMessage());}
-
 
                                                     ApiService apiService = retrofit.create(ApiService.class);
                                                     Call<SubscriptionDetails> call = apiService.getSubscriptionDetails(planSub, purchaseToken);
@@ -835,9 +837,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
                                                                     // Mostrar la fecha de expiración en logs o UI
                                                                     Log.d("testOffer 1Stails", "Expiry Date1: " + formattedDate_ex);
-
-                                                                    // Puedes manejar la fecha de expiración como necesites
-                                                                    // Por ejemplo, mostrarla en un TextView, compararla con la fecha actual, etc.
                                                                 }
                                                             } else {
                                                                 // Maneja errores de la respuesta aquí
@@ -858,13 +857,11 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                                     } catch (ParseException e) {
                                                         throw new RuntimeException(e);
                                                     }
-
-
                                                 }
                                                 else if (planSub.equals("anual_01")) {
                                                     //calendar.add(calendar.MONTH, 12);
                                                     Retrofit retrofit = new Retrofit.Builder()
-                                                            .baseUrl("https://us-central1-mikroficha.cloudfunctions.net/getSubscriptionDetails/") // Asegúrate de reemplazar con tu URL
+                                                            .baseUrl("https://us-central1-mikroficha.cloudfunctions.net/getSubscriptionDetails/")
                                                             .addConverterFactory(GsonConverterFactory.create())
                                                             .build();
 
@@ -895,9 +892,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
                                                                     // Mostrar la fecha de expiración en logs o UI
                                                                     Log.d("testOffer 2Stails", "Expiry Date2: " + formattedDate_ex);
-
-                                                                    // Puedes manejar la fecha de expiración como necesites
-                                                                    // Por ejemplo, mostrarla en un TextView, compararla con la fecha actual, etc.
                                                                 }
                                                             } else {
                                                                 // Maneja errores de la respuesta aquí
@@ -920,24 +914,19 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                                     }
                                                 }
 
-
                                                 date = dateFormat.format(calendar.getTime());
                                                 editor.putString("datePurchase", date + ":" + lastRenewDate);
                                                 editor.apply();
                                                 Log.d("testOffer", " <Fecha>: " + date + ":" + lastRenewDate);
-
-
                                                 Log.d("testOffer", date + ":" + lastRenewDate+" -- Próxima renovación: " + lastRenewDate);
                                             }
-
                                         }
-                                        String fechasusc = prefences.getString("datePurchase","2022-01-01:2022-01-02");
 
+                                        String fechasusc = prefences.getString("datePurchase","2022-01-01:2022-01-02");
                                         SimpleDateFormat date_last_access = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                         Calendar c = Calendar.getInstance();
                                         Date currentTime = c.getTime();
                                         String last_access = date_last_access.format(currentTime);
-
                                         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
                                         if(planSub.equals("mensual_01")){
@@ -962,11 +951,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                                 datos.put("UID", "anónimo");
                                             }
 
-
                                             Log.d("testOffer","entro en mensual");
                                             mDatabase.child("UUID_APP").child(uuid_app).setValue(datos);
-
-                                        }else if(planSub.equals("anual_01")){
+                                        } else if(planSub.equals("anual_01")){
                                             plansub_c = "Anual";
                                             datos.put("ADMOB", false);
                                             datos.put("BACKUP",true);
@@ -991,8 +978,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
                                             Log.d("testOffer","entro en anual");
                                             mDatabase.child("UUID_APP").child(uuid_app).setValue(datos);
-
                                         }
+
                                         SharedPreferences sharedPreferences_dai = getSharedPreferences("MyAppPreferencesSubs", Context.MODE_PRIVATE);
                                         SharedPreferences.Editor editor = sharedPreferences_dai.edit();
                                         orderIDSub = ordeID;
@@ -1001,10 +988,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                         Log.d("testOffer plax2", TplanSub);
 
                                         proxima_renov ="\nRenovacion: " +lastRenewDate+" \uD83D\uDD04\n"+orderIDSub+"\n\nPlan: "+TplanSub;
-
-                                    }else
-                                    {
-
+                                    } else {
                                         SharedPreferences sharedPreferences_dai = getSharedPreferences("MyAppPreferencesSubs", Context.MODE_PRIVATE);
                                         SharedPreferences.Editor editor = sharedPreferences_dai.edit();
                                         editor.putString("planSub", "No cuenta con una suscripción");
@@ -1020,27 +1004,35 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                                 if(snapshot.exists()){
-
-                                                }else{
+                                                    Log.d("testOffer", "Existe configuración especial, no se elimina");
+                                                } else {
+                                                    Log.d("testOffer", "No existe configuración especial, se elimina");
                                                     mDatabase.child("UUID_APP").child(uuid_app).removeValue();
                                                 }
                                             }
 
                                             @Override
                                             public void onCancelled(@NonNull DatabaseError error) {
-
+                                                Log.e("testOffer", "Error al verificar CS: " + error.getMessage());
                                             }
                                         });
-
                                     }
+
+                                    // Llamar al método para verificar la fecha en Firebase
+                                    verificarFechaEnFirebase(subscriptionActive[0]);
                                 }
                             }
                     );
+                } else {
+                    Log.e("testOffer", "Error en BillingClient setup: " + billingResult.getResponseCode());
+                    // Si hay un error, llamamos igual a verificarFechaEnFirebase pero con false
+                    verificarFechaEnFirebase(false);
                 }
-
             }
         });
-//addValueEventListener
+    }
+
+    private void verificarFechaEnFirebase(final boolean tieneSubscripcionActiva) {
         mDatabase.child("UUID_APP").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -1048,63 +1040,68 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                     if(snapshot.child(uuid_app).exists()){
                         if(snapshot.child(uuid_app).child("FECHA").exists()) {
                             fecha = snapshot.child(uuid_app).child("FECHA").getValue().toString().split(":")[1];
-                            Log.d("testt", fecha);
+                            Log.d("testt", "Fecha expiración: " + fecha);
+
                             if(!fecha.equals("-")) {
                                 try {
-                                    Date fechaFinal = dateFormat.parse(fecha+"");
-                                    Date fechaInicial = dateFormat.parse(date+"");
-                                    int dif = (int) TimeUnit.DAYS.convert(fechaFinal.getTime() - fechaInicial.getTime(), TimeUnit.MILLISECONDS);// / 86400000;
-                                    Log.d("testt", dif+"");
-                                    if(dif <= 5 && dif >= 1)
-                                        Toast.makeText(MainActivity.this,"En "+dif+" días termina tu suscripción." ,Toast.LENGTH_SHORT).show();
-                                    else if(dif <= 0){
-                                        Toast.makeText(MainActivity.this,"Renueva tu suscripción" ,Toast.LENGTH_LONG).show();
+                                    Date fechaFinal = dateFormat.parse(fecha);
+                                    Date fechaInicial = dateFormat.parse(date);
+                                    int dif = (int) TimeUnit.DAYS.convert(fechaFinal.getTime() - fechaInicial.getTime(), TimeUnit.MILLISECONDS);
+                                    Log.d("testt", "Días restantes: " + dif);
 
-                                        DatabaseReference refDatabase = FirebaseDatabase.getInstance().getReference("UUID_APP/"+uuid_app+"/CS");
-                                        Log.d("testt", refDatabase+"");
-                                        refDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                Log.d("testt", snapshot+"");
-                                                if(snapshot.exists()){
-                                                    Log.d("testt", "zii");
+                                    // Solo mostrar mensajes si NO hay suscripción activa
+                                    if(!tieneSubscripcionActiva) {
+                                        if (dif <= 5 && dif >= 1) {
+                                            Toast.makeText(MainActivity.this, "En " + dif + " días termina tu suscripción.", Toast.LENGTH_SHORT).show();
+                                        } else if (dif <= 0) {
+                                            Toast.makeText(MainActivity.this, "Renueva tu suscripción", Toast.LENGTH_LONG).show();
 
-                                                }else{
-                                                    Log.d("testt",""+snapshot.exists() );
-                                                    mDatabase.child("UUID_APP").child(uuid_app).removeValue();
+                                            // Verificar si hay registro de configuración especial (CS)
+                                            DatabaseReference refDatabase = FirebaseDatabase.getInstance().getReference("UUID_APP/" + uuid_app + "/CS");
+                                            Log.d("testt", "Verificando CS: " + refDatabase);
+
+                                            refDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    Log.d("testt", "Snapshot CS: " + snapshot);
+                                                    if (!snapshot.exists()) {
+                                                        Log.d("testt", "CS no existe, eliminando datos de usuario");
+                                                        mDatabase.child("UUID_APP").child(uuid_app).removeValue();
+                                                    }
                                                 }
-                                            }
 
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError error) {
-
-                                            }
-                                        });
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+                                                    Log.e("testt", "Error al verificar CS: " + error.getMessage());
+                                                }
+                                            });
+                                        }
+                                    } else {
+                                        Log.d("testt", "Usuario tiene suscripción activa, no mostrando mensajes de renovación");
                                     }
                                 } catch (ParseException e) {
+                                    Log.e("testt", "Error al parsear fechas: " + e.getMessage());
                                     e.printStackTrace();
                                 }
-
+                            }
+                        } else {
+                            if(!tieneSubscripcionActiva) {
+                                Toast.makeText(MainActivity.this, "Obtén más beneficios con una suscripción.", Toast.LENGTH_SHORT).show();
                             }
                         }
-                        else
-                        {
-                            Toast.makeText(MainActivity.this,"Obtén más veneficios con una suscripción.",Toast.LENGTH_SHORT).show();
-                        }
+                    } else {
+                        Log.d("testOffer", "UUID_APP no existe en la base de datos");
                     }
-                    else {
-                        Log.d("testOffer", "no esta el UUID_APP");
-                    }
+                } else {
+                    Log.d("testOffer", "No hay datos en la ruta UUID_APP");
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Log.e("testOffer", "Error al leer datos de Firebase: " + error.getMessage());
             }
         });
-
-
     }
 
 
