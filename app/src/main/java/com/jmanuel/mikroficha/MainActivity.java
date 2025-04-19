@@ -148,6 +148,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private static final long MAX_LOGO_SIZE = 300 * 1024; // 300KB en bytes
 
     private static final int REQUEST_CODE_UPDATE = 1234;
+
+    private Boolean REWARDS_BUTTON_ENABLED = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -168,6 +171,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         admob_preference = MainActivity.this.getSharedPreferences("clave_uuid_app",Context.MODE_PRIVATE);
         ADMOB = admob_preference.getBoolean("ADMOB",true);
         MIKROBOT_ON = admob_preference.getBoolean("MIKROBOT",false);
+        REWARDS_BUTTON_ENABLED = prefences.getBoolean("REWARDS_BUTTON", false);
 
         if(uuid_app.equals("N/A")) {
             editor.putString("uuid_app", generarRandomUUID());
@@ -215,6 +219,12 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         }
         else {
             btn_chatbot.setVisibility(View.GONE);
+        }
+
+        if (REWARDS_BUTTON_ENABLED) {
+            btn_reward_bono.setVisibility(View.VISIBLE);
+        } else {
+            btn_reward_bono.setVisibility(View.GONE);
         }
 
 
@@ -646,6 +656,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         defaults.put("mostrarmikrobot", mostrar_mikrobot);
         defaults.put("admob", true);
         defaults.put("botonmikrobot", true);
+        defaults.put("rewards_button_enabled", false);
         remoteConfig.setDefaultsAsync(defaults);
 
         // Obtener configuraciones actualizadas
@@ -672,10 +683,16 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         Log.d("MikrobotDebug", "Valor remoto de botonmikrobot: " + remoteMikrobotValue);
         editor.putBoolean("MIKROBOT", remoteMikrobotValue);
         editor.putBoolean("ADMOB", remoteConfig.getBoolean("admob"));
+        // Guarda el valor de rewards_button_enabled en las preferencias
+        boolean rewardsButtonValue = remoteConfig.getBoolean("rewards_button_enabled");
+        Log.d("RewardsDebug", "Valor remoto de rewards_button_enabled: " + rewardsButtonValue);
+        editor.putBoolean("REWARDS_BUTTON", rewardsButtonValue);
+
         editor.apply();
 
         // Actualiza las variables en memoria inmediatamente
         MIKROBOT_ON = remoteMikrobotValue;
+        REWARDS_BUTTON_ENABLED = rewardsButtonValue;
         ADMOB = remoteConfig.getBoolean("admob");
 
         // Aplica las configuraciones a la UI inmediatamente con los valores predeterminados
@@ -733,6 +750,15 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         } else {
             Log.d("MikrobotDebug", "Ocultando botón chatbot");
             btn_chatbot.setVisibility(View.GONE);
+        }
+
+        // Actualizar visibilidad del botón de recompensas
+        if (REWARDS_BUTTON_ENABLED) {
+            Log.d("RewardsDebug", "Mostrando botón de recompensas");
+            btn_reward_bono.setVisibility(View.VISIBLE);
+        } else {
+            Log.d("RewardsDebug", "Ocultando botón de recompensas");
+            btn_reward_bono.setVisibility(View.GONE);
         }
     }
 
