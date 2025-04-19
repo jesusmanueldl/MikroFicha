@@ -102,6 +102,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private CardView btn_chatbot;
 
     private CardView btn_temply;
+
+    private CardView btn_reward_bono;
     private ImageCarousel carousel;
     int version_app;
     private int mostrarBoton;
@@ -197,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         btn_utileria = findViewById(R.id.btn_utileria_main);
         btn_chatbot = findViewById(R.id.btn_gpt);
         btn_temply = findViewById(R.id.btn_temply);
+        btn_reward_bono = findViewById(R.id.btn_reward_bono);
 
         if (adview != null && ADMOB) {
             adview.setVisibility(View.VISIBLE);
@@ -344,6 +347,15 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             public void onClick(View view) {
 
                 startActivity(new Intent(MainActivity.this, TemplateDesignerActivity.class));
+                finish();
+            }
+        });
+
+        btn_reward_bono.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                startActivity(new Intent(MainActivity.this, RewardsActivity.class));
                 finish();
             }
         });
