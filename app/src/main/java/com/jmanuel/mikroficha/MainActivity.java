@@ -169,7 +169,13 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         editor = prefences.edit();
         uuid_app = prefences.getString("uuid_app","N/A");
         admob_preference = MainActivity.this.getSharedPreferences("clave_uuid_app",Context.MODE_PRIVATE);
+
+
+        adview = findViewById(R.id.adView);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        actualizarEstadoAdmobFinal();
         ADMOB = admob_preference.getBoolean("ADMOB",true);
+
         MIKROBOT_ON = admob_preference.getBoolean("MIKROBOT",false);
         REWARDS_BUTTON_ENABLED = prefences.getBoolean("REWARDS_BUTTON", false);
 
@@ -179,9 +185,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             editor.apply();
         }
         datos = new HashMap<>();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        adview = findViewById(R.id.adView);
-
 
         PackageInfo pi = null;
         try {
@@ -611,6 +614,48 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         }
     }
 
+    private void actualizarEstadoAdmobFinal() {
+        final boolean[] tieneSuscripcion = {false};
+
+        // Paso 1: verificar suscripción primero
+        SharedPreferences prefs = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
+        boolean admobPorSubs = !prefs.getBoolean("ADMOB", true);
+
+        if (admobPorSubs) {
+            tieneSuscripcion[0] = true;
+            // ya tiene suscripción → no mostrar anuncios
+            ADMOB = false;
+            adview.setVisibility(View.GONE);
+            return;
+        }
+
+        // Paso 2: si no hay suscripción, revisar adsFreeUntil
+        mDatabase.child("REWARDS").child(uuid_app).child("adsFreeUntil")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        boolean showAds = true;
+                        if (snapshot.exists()) {
+                            long now = System.currentTimeMillis();
+                            long adsFreeUntil = snapshot.getValue(Long.class);
+                            showAds = now > adsFreeUntil;
+                        }
+
+                        ADMOB = showAds;
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putBoolean("ADMOB", showAds);
+                        editor.apply();
+
+                        adview.setVisibility(showAds ? View.VISIBLE : View.GONE);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e("Firebase", "Error al leer adsFreeUntil", error.toException());
+                    }
+                });
+    }
+
     private void verificarTodasLasActualizaciones() {
         // Primero, verificamos actualizaciones con Google Play
         AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(this);
@@ -682,7 +727,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         boolean remoteMikrobotValue = remoteConfig.getBoolean("botonmikrobot");
         Log.d("MikrobotDebug", "Valor remoto de botonmikrobot: " + remoteMikrobotValue);
         editor.putBoolean("MIKROBOT", remoteMikrobotValue);
-        editor.putBoolean("ADMOB", remoteConfig.getBoolean("admob"));
+        //editor.putBoolean("ADMOB", remoteConfig.getBoolean("admob"));
         // Guarda el valor de rewards_button_enabled en las preferencias
         boolean rewardsButtonValue = remoteConfig.getBoolean("rewards_button_enabled");
         Log.d("RewardsDebug", "Valor remoto de rewards_button_enabled: " + rewardsButtonValue);
@@ -705,11 +750,11 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 boolean configurationChanged = false;
 
                 if (snapshot.exists() && snapshot.child(uuid_app).exists()) {
-                    if (snapshot.child(uuid_app).child("ADMOB").exists()) {
+                    /*if (snapshot.child(uuid_app).child("ADMOB").exists()) {
                         ADMOB = (Boolean) snapshot.child(uuid_app).child("ADMOB").getValue();
                         editor.putBoolean("ADMOB", ADMOB);
                         configurationChanged = true;
-                    }
+                    }*/
 
                     if (snapshot.child(uuid_app).child("MIKROBOT").exists()) {
                         Boolean mikrobotValue = (Boolean) snapshot.child(uuid_app).child("MIKROBOT").getValue();
@@ -1139,7 +1184,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private void verificarFechaEnFirebase(final boolean tieneSubscripcionActiva) {
 
         // Primero actualizamos el estado de AdMob según la suscripción
-        if (tieneSubscripcionActiva) {
+        /*if (tieneSubscripcionActiva) {
             // Si tiene suscripción activa, ocultar anuncios
             prefences = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
             editor = prefences.edit();
@@ -1169,7 +1214,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                     }
                 }
             });
-        }
+        }*/
 
 
         mDatabase.child("UUID_APP").addListenerForSingleValueEvent(new ValueEventListener() {

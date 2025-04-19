@@ -1,6 +1,7 @@
 package com.jmanuel.mikroficha;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -39,6 +40,7 @@ public class RewardsActivity extends AppCompatActivity {
     // En campos UI
     private ImageView ivMedal;
     private TextView  tvMedalLabel;
+    private TextView  tv_level_title;
 
     // Firebase Realtime DB
     private DatabaseReference userRef =
@@ -67,6 +69,7 @@ public class RewardsActivity extends AppCompatActivity {
         tvRemaining = findViewById(R.id.tv_remaining_time);
         ivMedal     = findViewById(R.id.iv_medal);
         tvMedalLabel= findViewById(R.id.tv_medal_label);
+        tv_level_title= findViewById(R.id.tv_level_title);
         tvMedalSub = findViewById(R.id.tv_medal_sub);
         pbMedal    = findViewById(R.id.pb_medal);
 
@@ -95,10 +98,39 @@ public class RewardsActivity extends AppCompatActivity {
 
         btnWatchVideo.setOnClickListener(v -> showRewardedAd());
 
-        findViewById(R.id.tv_option_day)
-                .setOnClickListener(v -> redeem(COST_DAY, TimeUnit.DAYS.toMillis(1)));
-        findViewById(R.id.tv_option_week)
-                .setOnClickListener(v -> redeem(COST_WEEK, TimeUnit.DAYS.toMillis(7)));
+        View.OnClickListener validarYCanjear = v -> {
+            SharedPreferences prefs = getSharedPreferences("clave_uuid_app", MODE_PRIVATE);
+            boolean admobActivo = prefs.getBoolean("ADMOB", true);  // true = hay anuncios → puede canjear
+
+            if (!admobActivo) {
+                Toast.makeText(this, "Ya tienes una suscripción activa. No necesitas canjear puntos.", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            // Verificación adicional en Firebase (opcional pero más seguro)
+            String uuid_app = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("UUID_APP").child(uuid_app).child("ADMOB");
+
+            ref.get().addOnSuccessListener(snapshot -> {
+                boolean tieneSubscripcion = snapshot.exists() && !snapshot.getValue(Boolean.class); // false = no mostrar anuncios
+
+                if (tieneSubscripcion) {
+                    Toast.makeText(this, "Ya tienes una suscripción activa. No puedes usar puntos.", Toast.LENGTH_LONG).show();
+                } else {
+                    if (v.getId() == R.id.tv_option_day) {
+                        redeem(COST_DAY, TimeUnit.DAYS.toMillis(1));
+                    } else {
+                        redeem(COST_WEEK, TimeUnit.DAYS.toMillis(7));
+                    }
+                }
+            }).addOnFailureListener(e -> {
+                Toast.makeText(this, "No se pudo verificar la suscripción. Intenta de nuevo.", Toast.LENGTH_SHORT).show();
+                Log.e("REWARD", "Error al verificar suscripción", e);
+            });
+        };
+
+        findViewById(R.id.tv_option_day).setOnClickListener(validarYCanjear);
+        findViewById(R.id.tv_option_week).setOnClickListener(validarYCanjear);
 
         loadRewarded();
     }
@@ -154,6 +186,7 @@ public class RewardsActivity extends AppCompatActivity {
 
         ivMedal.setImageResource(medalRes);
         tvMedalLabel.setText(medalName);
+        tv_level_title.setText("\uD83C\uDFC6 Nivel actual: "+ medalName);
 
         // tabla de umbrales
         int nextThreshold;
@@ -317,11 +350,17 @@ public class RewardsActivity extends AppCompatActivity {
                     return;
                 }
 
+                // ✅ Canje exitoso → desactivar anuncios temporalmente
+                SharedPreferences.Editor editor = getSharedPreferences("clave_uuid_app", MODE_PRIVATE).edit();
+                editor.putBoolean("ADMOB", false);
+                editor.apply();
+
                 Toast.makeText(RewardsActivity.this,
                         "Recompensa canjeada 🎉", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 
 
 
