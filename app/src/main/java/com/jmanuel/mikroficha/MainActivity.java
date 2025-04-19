@@ -142,6 +142,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private String TplanSub = "";
     //_____________________________________________
 
+    private static final int REQUEST_PERMISSION_SETTINGS = 3;
+    private static final long MAX_LOGO_SIZE = 300 * 1024; // 300KB en bytes
+
     private static final int REQUEST_CODE_UPDATE = 1234;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         mDatabase = FirebaseDatabase.getInstance().getReference();
         adview = findViewById(R.id.adView);
 
+
         PackageInfo pi = null;
         try {
             pi = MainActivity.this.getPackageManager().getPackageInfo(getPackageName(),0);
@@ -193,6 +197,23 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         btn_utileria = findViewById(R.id.btn_utileria_main);
         btn_chatbot = findViewById(R.id.btn_gpt);
         btn_temply = findViewById(R.id.btn_temply);
+
+        if (adview != null && ADMOB) {
+            adview.setVisibility(View.VISIBLE);
+            MobileAds.initialize(this, initializationStatus -> {});
+            AdRequest adRequest = new AdRequest.Builder().build();
+            adview.loadAd(adRequest);
+        } else if (adview != null) {
+            adview.setVisibility(View.GONE);
+        }
+
+        if(MIKROBOT_ON || mostrar_mikrobot) {
+            btn_chatbot.setVisibility(View.VISIBLE);
+        }
+        else {
+            btn_chatbot.setVisibility(View.GONE);
+        }
+
 
         btn_router.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -409,28 +430,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             }
         });
 
-        habilita_remoto_config();
-        if (adview != null && ADMOB) {
-            adview.setVisibility(View.VISIBLE);
-            MobileAds.initialize(this, initializationStatus -> {});
-            AdRequest adRequest = new AdRequest.Builder().build();
-            adview.loadAd(adRequest);
-        } else if (adview != null) {
-            adview.setVisibility(View.GONE);
-        }
-
-        if(MIKROBOT_ON || mostrar_mikrobot) {
-            btn_chatbot.setVisibility(View.VISIBLE);
-        }
-        else {
-            btn_chatbot.setVisibility(View.GONE);
-        }
-
-        verificarActualizacionGooglePlay();
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            verificarActualizacion();
-        },5000);
-
         // Verificar si el usuario tiene desactivadas las notificaciones manualmente
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -449,6 +448,12 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                         .setNegativeButton("Cancelar", null)
                         .show();
             }
+        }
+
+
+        verificarTodasLasActualizaciones();
+        if (BuildConfig.DEBUG) {
+            sincronizarConfiguracionesFirebase();
         }
 
     }
@@ -584,143 +589,176 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         }
     }
 
-    private void verificarActualizacionGooglePlay() {
+    private void verificarTodasLasActualizaciones() {
+        // Primero, verificamos actualizaciones con Google Play
         AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(this);
         Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
 
-        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
-            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
-                try {
+        appUpdateInfoTask.addOnCompleteListener(task -> {
+            try {
+                AppUpdateInfo appUpdateInfo = task.getResult();
+                if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                        && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                    // Si hay una actualización disponible, la iniciamos
                     appUpdateManager.startUpdateFlowForResult(
                             appUpdateInfo,
                             AppUpdateType.IMMEDIATE,
                             this,
                             REQUEST_CODE_UPDATE
                     );
-                } catch (Exception e) {
-                    Log.e("Actualización", "Error al iniciar la actualización", e);
+                } else {
+                    // Si no hay actualización de Google Play o hubo un error, continuamos con Firebase
+                    sincronizarConfiguracionesFirebase();
                 }
+            } catch (Exception e) {
+                Log.e("Actualización", "Error al verificar actualizaciones con Google Play", e);
+                // Si falla, continuamos con Firebase
+                sincronizarConfiguracionesFirebase();
             }
         });
     }
 
-    public void verificarActualizacion(){
-        long interval = 3600;
-        if(BuildConfig.DEBUG)
-            interval = 5;
-
+    private void sincronizarConfiguracionesFirebase() {
+        // Configurar Firebase Remote Config
+        long interval = BuildConfig.DEBUG ? 5 : 3600;
         FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
-        configurarRemoteConfig(remoteConfig);
-        HashMap<String,Object> actualizacion = new HashMap<>();
-        actualizacion.put("versioncode",version_app);
-        actualizacion.put("mostrarbotonentrar",mostrarBoton);
-        actualizacion.put("mostrarmikrobot",mostrar_mikrobot);
+        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+                .setMinimumFetchIntervalInSeconds(interval)
+                .build();
+        remoteConfig.setConfigSettingsAsync(configSettings);
 
-        remoteConfig.setDefaultsAsync(actualizacion);
-        remoteConfig.fetchAndActivate()
-                .addOnCompleteListener(MainActivity.this, new OnCompleteListener<Boolean>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Boolean> task) {
-                        mostrarMensaje();
-                    }
-                });
+        // Establecer valores por defecto
+        HashMap<String, Object> defaults = new HashMap<>();
+        defaults.put("versioncode", version_app);
+        defaults.put("mostrarbotonentrar", mostrarBoton);
+        defaults.put("mostrarmikrobot", mostrar_mikrobot);
+        defaults.put("admob", true);
+        defaults.put("botonmikrobot", true);
+        remoteConfig.setDefaultsAsync(defaults);
+
+        // Obtener configuraciones actualizadas
+        remoteConfig.fetchAndActivate().addOnCompleteListener(this, task -> {
+            if (task.isSuccessful()) {
+                // Actualizar configuraciones de usuario
+                actualizarConfiguracionesUsuario(remoteConfig);
+
+                // Verificar si hay una actualización de versión disponible
+                verificarVersionApp(remoteConfig);
+            } else {
+                Log.e("Firebase", "Error al obtener configuración remota", task.getException());
+            }
+        });
     }
 
-    public void habilita_remoto_config(){
-        long interval = 3600;
-        if(BuildConfig.DEBUG)
-            interval = 5;
+    private void actualizarConfiguracionesUsuario(FirebaseRemoteConfig remoteConfig) {
+        // Guardar configuraciones globales
+        prefences = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
+        editor = prefences.edit();
 
-        FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
-        configurarRemoteConfig(remoteConfig);
-        HashMap<String,Object> actualizacion = new HashMap<>();
-        actualizacion.put("ADMOB",true);
-        actualizacion.put("MIKROBOT",true);
+        // Guarda el valor de botonmikrobot en las preferencias
+        boolean remoteMikrobotValue = remoteConfig.getBoolean("botonmikrobot");
+        Log.d("MikrobotDebug", "Valor remoto de botonmikrobot: " + remoteMikrobotValue);
+        editor.putBoolean("MIKROBOT", remoteMikrobotValue);
+        editor.putBoolean("ADMOB", remoteConfig.getBoolean("admob"));
+        editor.apply();
 
-        remoteConfig.setDefaultsAsync(actualizacion);
-        remoteConfig.fetchAndActivate()
-                .addOnCompleteListener(MainActivity.this, new OnCompleteListener<Boolean>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Boolean> task) {
-                        prefences = MainActivity.this.getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
-                        editor = prefences.edit();
-                        editor.putBoolean("ADMOB", (Boolean) remoteConfig.getBoolean("admob"));
-                        editor.putBoolean("MIKROBOT", (Boolean) remoteConfig.getBoolean("botonmikrobot"));
+        // Actualiza las variables en memoria inmediatamente
+        MIKROBOT_ON = remoteMikrobotValue;
+        ADMOB = remoteConfig.getBoolean("admob");
+
+        // Aplica las configuraciones a la UI inmediatamente con los valores predeterminados
+        aplicarConfiguracionesUI();
+
+        // Verificar configuraciones específicas del usuario
+        mDatabase.child("UUID_APP").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                boolean configurationChanged = false;
+
+                if (snapshot.exists() && snapshot.child(uuid_app).exists()) {
+                    if (snapshot.child(uuid_app).child("ADMOB").exists()) {
+                        ADMOB = (Boolean) snapshot.child(uuid_app).child("ADMOB").getValue();
+                        editor.putBoolean("ADMOB", ADMOB);
+                        configurationChanged = true;
+                    }
+
+                    if (snapshot.child(uuid_app).child("MIKROBOT").exists()) {
+                        Boolean mikrobotValue = (Boolean) snapshot.child(uuid_app).child("MIKROBOT").getValue();
+                        Log.d("MikrobotDebug", "Valor específico de usuario para MIKROBOT: " + mikrobotValue);
+                        MIKROBOT_ON = mikrobotValue;
+                        editor.putBoolean("MIKROBOT", MIKROBOT_ON);
+                        configurationChanged = true;
+                    }
+
+                    if (configurationChanged) {
                         editor.apply();
-
-                        mDatabase.child("UUID_APP").addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if(snapshot.exists()){
-                                    if(snapshot.child(uuid_app).child("ADMOB").exists()) {
-                                        prefences = MainActivity.this.getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
-                                        editor = prefences.edit();
-                                        editor.putBoolean("ADMOB", (Boolean) snapshot.child(uuid_app).child("ADMOB").getValue());
-                                        editor.apply();
-                                    }
-
-                                    if(snapshot.child(uuid_app).child("MIKROBOT").exists()) {
-                                        prefences = MainActivity.this.getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
-                                        editor = prefences.edit();
-                                        editor.putBoolean("MIKROBOT", (Boolean) snapshot.child(uuid_app).child("MIKROBOT").getValue());
-                                        editor.apply();
-                                    }
-
-                                    ADMOB = admob_preference.getBoolean("ADMOB",true);
-                                    MIKROBOT_ON = admob_preference.getBoolean("MIKROBOT",false);
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
+                        // Aplicar configuraciones a la UI de nuevo si cambiaron
+                        runOnUiThread(() -> aplicarConfiguracionesUI());
                     }
-                });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("Firebase", "Error al leer configuraciones de usuario", error.toException());
+            }
+        });
     }
 
-    private void mostrarMensaje() {
+    private void aplicarConfiguracionesUI() {
+        Log.d("MikrobotDebug", "Aplicando configuraciones UI: MIKROBOT_ON=" + MIKROBOT_ON +
+                ", mostrar_mikrobot=" + mostrar_mikrobot);
+
+        // Actualizar visibilidad de AdMob basado en configuraciones actualizadas
+        if (adview != null) {
+            adview.setVisibility(ADMOB ? View.VISIBLE : View.GONE);
+        }
+
+        // Actualizar visibilidad del botón mikrobot
+        if (MIKROBOT_ON || mostrar_mikrobot) {
+            Log.d("MikrobotDebug", "Mostrando botón chatbot");
+            btn_chatbot.setVisibility(View.VISIBLE);
+        } else {
+            Log.d("MikrobotDebug", "Ocultando botón chatbot");
+            btn_chatbot.setVisibility(View.GONE);
+        }
+    }
+
+    private void verificarVersionApp(FirebaseRemoteConfig remoteConfig) {
         // Verificar si la Activity ya está finalizada o en proceso de destrucción
         if (isFinishing() || isDestroyed()) {
             return;
         }
-        FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
+
         String nversion = remoteConfig.getString("versioncode");
         String nuevobotonmostrar = remoteConfig.getString("mostrarbotonentrar");
-        boolean nuevobotonmikrobot = remoteConfig.getBoolean("botonmikrobot");
-        if(nuevobotonmostrar.equals(""))
+
+        if (nuevobotonmostrar.equals("")) {
             nuevobotonmostrar = "1";
-        else {
+        } else {
             if (Integer.parseInt(nuevobotonmostrar) == 1) {
                 if (version_app < Integer.parseInt(nversion)) {
-                    androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this);
-                    builder.setMessage("Actualiza la app y no te pierdas las nuevas funcionalidades")
-                            .setCancelable(false)
-                            .setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    Uri url = Uri.parse("https://play.google.com/store/apps/details?id=com.jmanuel.mikroficha");
-                                    startActivity(new Intent(Intent.ACTION_VIEW, url));
-                                    dialogInterface.dismiss();
-                                }
-                            });
-                    androidx.appcompat.app.AlertDialog titulo = builder.create();
-                    titulo.setTitle("¡Hay una nueva actulización!");
-                    titulo.show();
+                    // Mostrar diálogo de actualización
+                    mostrarDialogoActualizacion();
                 }
             } else {
                 btn_router.setVisibility(View.GONE);
             }
         }
+    }
 
-         if(nuevobotonmikrobot || MIKROBOT_ON)
-             btn_chatbot.setVisibility(View.VISIBLE);
-
-         else {
-             btn_chatbot.setVisibility(View.GONE);
-         }
+    private void mostrarDialogoActualizacion() {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        builder.setMessage("Actualiza la app y no te pierdas las nuevas funcionalidades")
+                .setCancelable(false)
+                .setPositiveButton("Actualizar", (dialogInterface, i) -> {
+                    Uri url = Uri.parse("https://play.google.com/store/apps/details?id=com.jmanuel.mikroficha");
+                    startActivity(new Intent(Intent.ACTION_VIEW, url));
+                    dialogInterface.dismiss();
+                });
+        androidx.appcompat.app.AlertDialog titulo = builder.create();
+        titulo.setTitle("¡Hay una nueva actualización!");
+        titulo.show();
     }
 
     public String generarRandomUUID() {
@@ -951,6 +989,20 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                                 datos.put("UID", "anónimo");
                                             }
 
+                                            // Actualizar ADMOB inmediatamente
+                                            prefences = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
+                                            editor = prefences.edit();
+                                            editor.putBoolean("ADMOB", false);
+                                            editor.apply();
+                                            ADMOB = false;
+
+                                            // Actualizar UI en el hilo principal
+                                            runOnUiThread(() -> {
+                                                if (adview != null) {
+                                                    adview.setVisibility(View.GONE);
+                                                }
+                                            });
+
                                             Log.d("testOffer","entro en mensual");
                                             mDatabase.child("UUID_APP").child(uuid_app).setValue(datos);
                                         } else if(planSub.equals("anual_01")){
@@ -975,6 +1027,20 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                                 datos.put("CORREO", "sin_cuenta");
                                                 datos.put("UID", "anónimo");
                                             }
+
+                                            // Actualizar ADMOB inmediatamente
+                                            prefences = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
+                                            editor = prefences.edit();
+                                            editor.putBoolean("ADMOB", false);
+                                            editor.apply();
+                                            ADMOB = false;
+
+                                            // Actualizar UI en el hilo principal
+                                            runOnUiThread(() -> {
+                                                if (adview != null) {
+                                                    adview.setVisibility(View.GONE);
+                                                }
+                                            });
 
                                             Log.d("testOffer","entro en anual");
                                             mDatabase.child("UUID_APP").child(uuid_app).setValue(datos);
@@ -1033,6 +1099,41 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     }
 
     private void verificarFechaEnFirebase(final boolean tieneSubscripcionActiva) {
+
+        // Primero actualizamos el estado de AdMob según la suscripción
+        if (tieneSubscripcionActiva) {
+            // Si tiene suscripción activa, ocultar anuncios
+            prefences = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
+            editor = prefences.edit();
+            editor.putBoolean("ADMOB", false);
+            editor.apply();
+            ADMOB = false;
+
+            runOnUiThread(() -> {
+                if (adview != null) {
+                    adview.setVisibility(View.GONE);
+                }
+            });
+        } else {
+            // Si no tiene suscripción, mostrar anuncios (a menos que tenga configuración especial)
+            prefences = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
+            editor = prefences.edit();
+            editor.putBoolean("ADMOB", true);
+            editor.apply();
+            ADMOB = true;
+
+            runOnUiThread(() -> {
+                if (adview != null) {
+                    adview.setVisibility(View.VISIBLE);
+                    if (adview.getAdSize() == null) { // Si no se ha cargado un anuncio todavía
+                        AdRequest adRequest = new AdRequest.Builder().build();
+                        adview.loadAd(adRequest);
+                    }
+                }
+            });
+        }
+
+
         mDatabase.child("UUID_APP").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
