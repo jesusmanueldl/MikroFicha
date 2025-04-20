@@ -100,27 +100,29 @@ public class RewardsActivity extends AppCompatActivity {
 
         View.OnClickListener validarYCanjear = v -> {
             SharedPreferences prefs = getSharedPreferences("clave_uuid_app", MODE_PRIVATE);
-            boolean tieneSubscrip = prefs.getBoolean("TIENE_SUBSCRIPCION", false);
+            boolean tieneSubscripcion = prefs.getBoolean("TIENE_SUBSCRIPCION", false);
 
-            if (tieneSubscrip) {
-                Toast.makeText(this, "Ya tienes una suscripción activa. No necesitas canjear puntos.", Toast.LENGTH_LONG).show();
+            if (tieneSubscripcion) {
+                Toast.makeText(this, "Ya tienes una suscripción activa. No puedes usar puntos.", Toast.LENGTH_LONG).show();
                 return;
             }
 
-            // Verificación adicional en Firebase (opcional pero más seguro)
+            // (Opcional) respaldo desde Firebase si se desea
             String uuid_app = FirebaseAuth.getInstance().getCurrentUser().getUid();
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference("UUID_APP").child(uuid_app).child("ADMOB");
 
             ref.get().addOnSuccessListener(snapshot -> {
-                boolean tieneSubscripcion = snapshot.exists() && !snapshot.getValue(Boolean.class); // false = no mostrar anuncios
+                boolean admobActivo = snapshot.exists() ? snapshot.getValue(Boolean.class) : true;
 
-                if (tieneSubscripcion) {
-                    Toast.makeText(this, "Ya tienes una suscripción activa. No puedes usar puntos.", Toast.LENGTH_LONG).show();
+                if (!admobActivo) {
+                    Toast.makeText(this, "Tienes una suscripción activa (ADMOB). No puedes usar puntos.", Toast.LENGTH_LONG).show();
                 } else {
                     if (v.getId() == R.id.tv_option_day) {
                         redeem(COST_DAY, TimeUnit.DAYS.toMillis(1));
-                    } else {
+                    } else if (v.getId() == R.id.tv_option_week) {
                         redeem(COST_WEEK, TimeUnit.DAYS.toMillis(7));
+                    } else {
+                        Toast.makeText(this, "Opción no reconocida.", Toast.LENGTH_SHORT).show();
                     }
                 }
             }).addOnFailureListener(e -> {
@@ -128,6 +130,7 @@ public class RewardsActivity extends AppCompatActivity {
                 Log.e("REWARD", "Error al verificar suscripción", e);
             });
         };
+
 
         findViewById(R.id.tv_option_day).setOnClickListener(validarYCanjear);
         findViewById(R.id.tv_option_week).setOnClickListener(validarYCanjear);

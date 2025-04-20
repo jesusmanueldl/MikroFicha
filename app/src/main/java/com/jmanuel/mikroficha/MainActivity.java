@@ -154,7 +154,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        //
+        // setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_new);
 
         // Verificar y pedir permiso para notificaciones en Android 13+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -460,7 +462,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             }
         }
 
-    Toast.makeText(MainActivity.this,"ads = "+ADMOB,Toast.LENGTH_SHORT).show();
+    //Toast.makeText(MainActivity.this,"ads = "+ADMOB,Toast.LENGTH_SHORT).show();
         verificarTodasLasActualizaciones();
         if (BuildConfig.DEBUG) {
             sincronizarConfiguracionesFirebase();

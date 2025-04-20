@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradiente_admin3"
+    android:background="@drawable/gradiente_admin5"
     android:orientation="vertical"
     tools:context=".Precios">
 
