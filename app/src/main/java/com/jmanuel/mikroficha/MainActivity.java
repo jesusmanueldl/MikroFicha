@@ -174,7 +174,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         adview = findViewById(R.id.adView);
         mDatabase = FirebaseDatabase.getInstance().getReference();
         actualizarEstadoAdmobFinal();
-        ADMOB = admob_preference.getBoolean("ADMOB",true);
 
         MIKROBOT_ON = admob_preference.getBoolean("MIKROBOT",false);
         REWARDS_BUTTON_ENABLED = prefences.getBoolean("REWARDS_BUTTON", false);
@@ -245,9 +244,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         btn_config.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                prefences = MainActivity.this.getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
-                uuid_app = prefences.getString("uuid_app", "N/A");
 
                 // Asegúrate que estas variables estén definidas antes (ya lo están)
                 // version_name, version_app, proxima_renov
@@ -401,17 +397,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                         Log.d("testOffer plax1", TplanSub);
 
                         checkSubcripcion();
-
-                        /*if (!currentDate.equals(lastRunDate)) {
-                            // Guarda la fecha actual en SharedPreferences
-                            SharedPreferences.Editor editor = sharedPreferences_dai.edit();
-                            editor.putString("lastRunDate", currentDate);
-                            editor.apply();
-
-                            // Ejecuta la función
-
-
-                        }*/
                         proxima_renov ="\nRenovacion: " +lastRenewDate+" \uD83D\uDD04\n"+orderIDSub+"\n\nPlan: "+TplanSub;
                     }
                     @Override
@@ -475,7 +460,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             }
         }
 
-
+    Toast.makeText(MainActivity.this,"ads = "+ADMOB,Toast.LENGTH_SHORT).show();
         verificarTodasLasActualizaciones();
         if (BuildConfig.DEBUG) {
             sincronizarConfiguracionesFirebase();
@@ -587,6 +572,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
         // Limpiar preferencias si es necesario
         SharedPreferences.Editor editor = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE).edit();
+        editor.remove("TIENE_SUBSCRIPCION");
         editor.clear();
         editor.apply();
 
@@ -630,7 +616,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         }
 
         // Paso 2: si no hay suscripción, revisar adsFreeUntil
-        mDatabase.child("REWARDS").child(uuid_app).child("adsFreeUntil")
+        mDatabase.child("REWARDS").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("adsFreeUntil")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -644,6 +630,18 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                         ADMOB = showAds;
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putBoolean("ADMOB", showAds);
+
+                        // Verificar si tiene suscripción de Google Play
+                        boolean tieneSuscripcionGP = prefs.getBoolean("TIENE_SUBSCRIPCION", false);
+
+                        // Si no tiene tiempo sin anuncios por puntos Y no tiene suscripción de Google
+                        // entonces asegurarse de que TIENE_SUBSCRIPCION sea false
+                        if (showAds && !tieneSuscripcionGP) {
+                            Log.d("AdmobEstado", "Ni recompensa activa ni suscripción: mostrar anuncios");
+                            editor.putBoolean("TIENE_SUBSCRIPCION", false);
+                        }
+
+
                         editor.apply();
 
                         adview.setVisibility(showAds ? View.VISIBLE : View.GONE);
@@ -896,6 +894,12 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
                                     if(list.size() > 0){
                                         subscriptionActive[0] = true;
+                                        SharedPreferences shared = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
+                                        SharedPreferences.Editor editora = shared.edit();
+                                        editora.putBoolean("TIENE_SUBSCRIPCION", true);  // ✅ Añade esta línea
+
+                                        editora.apply();
+                                        ADMOB = false;
                                         //si tiene mas de una subscripcion verificar cual tiene
                                         int i = 0;
                                         for(Purchase purchase: list){
@@ -1141,6 +1145,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                         SharedPreferences sharedPreferences_dai = getSharedPreferences("MyAppPreferencesSubs", Context.MODE_PRIVATE);
                                         SharedPreferences.Editor editor = sharedPreferences_dai.edit();
                                         editor.putString("planSub", "No cuenta con una suscripción");
+                                        subscriptionActive[0] = false;
+                                        editor.putBoolean("TIENE_SUBSCRIPCION", false);
                                         editor.apply();
                                         //si no tiene subcripcion hacer algo....
                                         Log.d("testOffer", "sin suscripcion");
@@ -1165,125 +1171,38 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                                 Log.e("testOffer", "Error al verificar CS: " + error.getMessage());
                                             }
                                         });
+
+                                        // ✅ Verificamos si también ha expirado adsFreeUntil
+                                        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                                        FirebaseDatabase.getInstance().getReference("REWARDS").child(uid).child("adsFreeUntil")
+                                                .get().addOnSuccessListener(snap -> {
+                                                    boolean mostrarAds = true;
+                                                    if (snap.exists()) {
+                                                        long until = snap.getValue(Long.class);
+                                                        mostrarAds = System.currentTimeMillis() > until;
+                                                    }
+
+                                                    if (mostrarAds) {
+                                                        SharedPreferences.Editor editor2 = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE).edit();
+                                                        editor2.putBoolean("ADMOB", true);  // ✅ Forzar mostrar anuncios
+                                                        editor2.apply();
+
+                                                        runOnUiThread(() -> {
+                                                            if (adview != null) {
+                                                                adview.setVisibility(View.VISIBLE);
+                                                            }
+                                                        });
+                                                    }
+                                                });
                                     }
 
-                                    // Llamar al método para verificar la fecha en Firebase
-                                    verificarFechaEnFirebase(subscriptionActive[0]);
                                 }
                             }
                     );
                 } else {
                     Log.e("testOffer", "Error en BillingClient setup: " + billingResult.getResponseCode());
-                    // Si hay un error, llamamos igual a verificarFechaEnFirebase pero con false
-                    verificarFechaEnFirebase(false);
+
                 }
-            }
-        });
-    }
-
-    private void verificarFechaEnFirebase(final boolean tieneSubscripcionActiva) {
-
-        // Primero actualizamos el estado de AdMob según la suscripción
-        /*if (tieneSubscripcionActiva) {
-            // Si tiene suscripción activa, ocultar anuncios
-            prefences = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
-            editor = prefences.edit();
-            editor.putBoolean("ADMOB", false);
-            editor.apply();
-            ADMOB = false;
-
-            runOnUiThread(() -> {
-                if (adview != null) {
-                    adview.setVisibility(View.GONE);
-                }
-            });
-        } else {
-            // Si no tiene suscripción, mostrar anuncios (a menos que tenga configuración especial)
-            prefences = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
-            editor = prefences.edit();
-            editor.putBoolean("ADMOB", true);
-            editor.apply();
-            ADMOB = true;
-
-            runOnUiThread(() -> {
-                if (adview != null) {
-                    adview.setVisibility(View.VISIBLE);
-                    if (adview.getAdSize() == null) { // Si no se ha cargado un anuncio todavía
-                        AdRequest adRequest = new AdRequest.Builder().build();
-                        adview.loadAd(adRequest);
-                    }
-                }
-            });
-        }*/
-
-
-        mDatabase.child("UUID_APP").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    if(snapshot.child(uuid_app).exists()){
-                        if(snapshot.child(uuid_app).child("FECHA").exists()) {
-                            fecha = snapshot.child(uuid_app).child("FECHA").getValue().toString().split(":")[1];
-                            Log.d("testt", "Fecha expiración: " + fecha);
-
-                            if(!fecha.equals("-")) {
-                                try {
-                                    Date fechaFinal = dateFormat.parse(fecha);
-                                    Date fechaInicial = dateFormat.parse(date);
-                                    int dif = (int) TimeUnit.DAYS.convert(fechaFinal.getTime() - fechaInicial.getTime(), TimeUnit.MILLISECONDS);
-                                    Log.d("testt", "Días restantes: " + dif);
-
-                                    // Solo mostrar mensajes si NO hay suscripción activa
-                                    if(!tieneSubscripcionActiva) {
-                                        if (dif <= 5 && dif >= 1) {
-                                            Toast.makeText(MainActivity.this, "En " + dif + " días termina tu suscripción.", Toast.LENGTH_SHORT).show();
-                                        } else if (dif <= 0) {
-                                            Toast.makeText(MainActivity.this, "Renueva tu suscripción", Toast.LENGTH_LONG).show();
-
-                                            // Verificar si hay registro de configuración especial (CS)
-                                            DatabaseReference refDatabase = FirebaseDatabase.getInstance().getReference("UUID_APP/" + uuid_app + "/CS");
-                                            Log.d("testt", "Verificando CS: " + refDatabase);
-
-                                            refDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                    Log.d("testt", "Snapshot CS: " + snapshot);
-                                                    if (!snapshot.exists()) {
-                                                        Log.d("testt", "CS no existe, eliminando datos de usuario");
-                                                        mDatabase.child("UUID_APP").child(uuid_app).removeValue();
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError error) {
-                                                    Log.e("testt", "Error al verificar CS: " + error.getMessage());
-                                                }
-                                            });
-                                        }
-                                    } else {
-                                        Log.d("testt", "Usuario tiene suscripción activa, no mostrando mensajes de renovación");
-                                    }
-                                } catch (ParseException e) {
-                                    Log.e("testt", "Error al parsear fechas: " + e.getMessage());
-                                    e.printStackTrace();
-                                }
-                            }
-                        } else {
-                            if(!tieneSubscripcionActiva) {
-                                Toast.makeText(MainActivity.this, "Obtén más beneficios con una suscripción.", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    } else {
-                        Log.d("testOffer", "UUID_APP no existe en la base de datos");
-                    }
-                } else {
-                    Log.d("testOffer", "No hay datos en la ruta UUID_APP");
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("testOffer", "Error al leer datos de Firebase: " + error.getMessage());
             }
         });
     }

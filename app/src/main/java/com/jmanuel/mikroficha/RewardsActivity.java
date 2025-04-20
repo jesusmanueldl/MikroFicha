@@ -100,9 +100,9 @@ public class RewardsActivity extends AppCompatActivity {
 
         View.OnClickListener validarYCanjear = v -> {
             SharedPreferences prefs = getSharedPreferences("clave_uuid_app", MODE_PRIVATE);
-            boolean admobActivo = prefs.getBoolean("ADMOB", true);  // true = hay anuncios → puede canjear
+            boolean tieneSubscrip = prefs.getBoolean("TIENE_SUBSCRIPCION", false);
 
-            if (!admobActivo) {
+            if (tieneSubscrip) {
                 Toast.makeText(this, "Ya tienes una suscripción activa. No necesitas canjear puntos.", Toast.LENGTH_LONG).show();
                 return;
             }
