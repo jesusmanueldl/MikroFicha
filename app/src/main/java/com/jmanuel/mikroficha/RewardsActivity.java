@@ -39,7 +39,6 @@ public class RewardsActivity extends AppCompatActivity {
 
     // En campos UI
     private ImageView ivMedal;
-    private TextView  tvMedalLabel;
     private TextView  tv_level_title;
 
     // Firebase Realtime DB
@@ -68,7 +67,6 @@ public class RewardsActivity extends AppCompatActivity {
         btnWatchVideo = findViewById(R.id.btn_watch_video);
         tvRemaining = findViewById(R.id.tv_remaining_time);
         ivMedal     = findViewById(R.id.iv_medal);
-        tvMedalLabel= findViewById(R.id.tv_medal_label);
         tv_level_title= findViewById(R.id.tv_level_title);
         tvMedalSub = findViewById(R.id.tv_medal_sub);
         pbMedal    = findViewById(R.id.pb_medal);
@@ -101,6 +99,7 @@ public class RewardsActivity extends AppCompatActivity {
         View.OnClickListener validarYCanjear = v -> {
             SharedPreferences prefs = getSharedPreferences("clave_uuid_app", MODE_PRIVATE);
             boolean tieneSubscripcion = prefs.getBoolean("TIENE_SUBSCRIPCION", false);
+            Log.d("testOffer", "TIENE_SUBSCRIPCION de reard class: "+tieneSubscripcion);
 
             if (tieneSubscripcion) {
                 Toast.makeText(this, "Ya tienes una suscripción activa. No puedes usar puntos.", Toast.LENGTH_LONG).show();
@@ -188,7 +187,6 @@ public class RewardsActivity extends AppCompatActivity {
         else { medalRes = R.drawable.ic_medal_bronze; medalName = "Bronce"; }
 
         ivMedal.setImageResource(medalRes);
-        tvMedalLabel.setText(medalName);
         tv_level_title.setText("\uD83C\uDFC6 Nivel actual: "+ medalName);
 
         // tabla de umbrales

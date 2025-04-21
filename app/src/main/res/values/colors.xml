@@ -4,7 +4,33 @@
     <color name="purple_500">#00897B</color>
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#5E35B1</color>
-    <color name="teal_700">#FF018786</color>
+    <color name="teal_700">#290187</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- LIGHT palette -->
+    <color name="primary_light">#7C4DFF</color>           <!-- Indigo vibrante -->
+    <color name="primary_variant_light">#651FFF</color>   <!-- Indigo profundo -->
+    <color name="secondary_light">#00B8D4</color>         <!-- Cyan brillante -->
+    <color name="secondary_variant_light">#00ACC1</color> <!-- Cyan oscuro -->
+    <color name="background_light">#FAFAFA</color>        <!-- Gris muy claro -->
+    <color name="surface_light">#FFFFFF</color>           <!-- Blanco puro -->
+    <color name="on_primary_light">#FFFFFF</color>        <!-- Texto/iconos sobre primary -->
+    <color name="on_secondary_light">#000000</color>      <!-- Texto/iconos sobre secondary -->
+    <color name="on_background_light">#202124</color>     <!-- Texto principal -->
+    <color name="on_surface_light">#202124</color>        <!-- Texto sobre surface -->
+
+    <!-- DARK palette -->
+    <color name="primary_dark">#651FFF</color>            <!-- Indigo profundo -->
+    <color name="primary_variant_dark">#7C4DFF</color>    <!-- Indigo vibrante -->
+    <color name="secondary_dark">#00ACC1</color>          <!-- Cyan oscuro -->
+    <color name="secondary_variant_dark">#00B8D4</color>  <!-- Cyan brillante -->
+    <color name="background_dark">#121212</color>         <!-- Negro casi puro -->
+    <color name="surface_dark">#1F1B24</color>            <!-- Gris muy oscuro -->
+    <color name="on_primary_dark">#000000</color>         <!-- Texto/iconos sobre primary -->
+    <color name="on_secondary_dark">#000000</color>       <!-- Texto/iconos sobre secondary -->
+    <color name="on_background_dark">#E6E6E6</color>      <!-- Texto principal -->
+    <color name="on_surface_dark">#E6E6E6</color>         <!-- Texto sobre surface -->
+
+
 </resources>

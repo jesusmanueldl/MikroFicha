@@ -90,13 +90,6 @@
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
 
-                            <TextView
-                                android:id="@+id/tv_medal_label"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Bronce"
-                                android:textColor="#333333"
-                                android:textStyle="bold" />
 
                             <TextView
                                 android:id="@+id/tv_medal_sub"

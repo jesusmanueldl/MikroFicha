@@ -462,7 +462,12 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             }
         }
 
-    //Toast.makeText(MainActivity.this,"ads = "+ADMOB,Toast.LENGTH_SHORT).show();
+        SharedPreferences prefs = getSharedPreferences("clave_uuid_app", MODE_PRIVATE);
+        boolean tieneSubscripcion = prefs.getBoolean("TIENE_SUBSCRIPCION", false);
+        Log.d("testOffer", "TIENE_SUBSCRIPCION de reward main: "+tieneSubscripcion);
+
+
+        //Toast.makeText(MainActivity.this,"ads = "+ADMOB,Toast.LENGTH_SHORT).show();
         verificarTodasLasActualizaciones();
         if (BuildConfig.DEBUG) {
             sincronizarConfiguracionesFirebase();
@@ -556,18 +561,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                     });
         }
     }
-
-    private void configurarRemoteConfig(FirebaseRemoteConfig remoteConfig) {
-        long interval = BuildConfig.DEBUG ? 5 : 3600;
-        FirebaseRemoteConfigSettings frconf = new FirebaseRemoteConfigSettings.Builder()
-                .setMinimumFetchIntervalInSeconds(interval)
-                .build();
-        remoteConfig.setConfigSettingsAsync(frconf);
-    }
-
-
-
-
     private void cerrarSesion() {
         // Cerrar sesión Firebase
         com.google.firebase.auth.FirebaseAuth.getInstance().signOut();
@@ -848,25 +841,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         return UUID.randomUUID().toString();
     }
 
-    public String generarRandomString(int legth){
-        String CHAR_LOWER = "abcdfghijklmnopqrstuvwxyz";
-        String CHAR_UPPER = CHAR_LOWER.toUpperCase();
-        String NUMBER = "0123456789";
-        String DATA_FOR_RANDOM_STRING = CHAR_LOWER + CHAR_UPPER + NUMBER;
-
-        SecureRandom random = new SecureRandom();
-        if(legth < 1 ) throw  new IllegalArgumentException();
-
-        StringBuilder sb = new StringBuilder(legth);
-        for( int i = 0; i < legth; i++){
-            int rndCharAt = random.nextInt(DATA_FOR_RANDOM_STRING.length());
-            char rndChar = DATA_FOR_RANDOM_STRING.charAt(rndCharAt);
-            sb.append(rndChar);
-        }
-
-        return sb.toString();
-    }
-
     private void checkSubcripcion(){
         // Al inicio del método checkSubcripcion()
         final boolean[] subscriptionActive = {false};
@@ -956,7 +930,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                                                     lastRenewDate = formattedDate_ex;
                                                                     TplanSub = "Mensual";
 
-                                                                    SharedPreferences sharedPreferences_dai = getSharedPreferences("MyAppPreferencesSubs", Context.MODE_PRIVATE);
+                                                                    SharedPreferences sharedPreferences_dai = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
                                                                     SharedPreferences.Editor editor = sharedPreferences_dai.edit();
                                                                     editor.putString("lastRenewDate", formattedDate_ex);
                                                                     editor.putString("planSub", TplanSub);
@@ -1011,7 +985,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                                                     lastRenewDate = formattedDate_ex;
                                                                     TplanSub = "Anual";
 
-                                                                    SharedPreferences sharedPreferences_dai = getSharedPreferences("MyAppPreferencesSubs", Context.MODE_PRIVATE);
+                                                                    SharedPreferences sharedPreferences_dai = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
                                                                     SharedPreferences.Editor editor = sharedPreferences_dai.edit();
                                                                     editor.putString("lastRenewDate", formattedDate_ex);
                                                                     editor.putString("planSub", TplanSub);
@@ -1135,7 +1109,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                             mDatabase.child("UUID_APP").child(uuid_app).setValue(datos);
                                         }
 
-                                        SharedPreferences sharedPreferences_dai = getSharedPreferences("MyAppPreferencesSubs", Context.MODE_PRIVATE);
+                                        SharedPreferences sharedPreferences_dai = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
                                         SharedPreferences.Editor editor = sharedPreferences_dai.edit();
                                         orderIDSub = ordeID;
                                         editor.putString("orderIDSub", orderIDSub);
@@ -1144,7 +1118,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
                                         proxima_renov ="\nRenovacion: " +lastRenewDate+" \uD83D\uDD04\n"+orderIDSub+"\n\nPlan: "+TplanSub;
                                     } else {
-                                        SharedPreferences sharedPreferences_dai = getSharedPreferences("MyAppPreferencesSubs", Context.MODE_PRIVATE);
+                                        SharedPreferences sharedPreferences_dai = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
                                         SharedPreferences.Editor editor = sharedPreferences_dai.edit();
                                         editor.putString("planSub", "No cuenta con una suscripción");
                                         subscriptionActive[0] = false;
@@ -1152,6 +1126,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                         editor.apply();
                                         //si no tiene subcripcion hacer algo....
                                         Log.d("testOffer", "sin suscripcion");
+
                                         DatabaseReference refDatabase = FirebaseDatabase.getInstance()
                                                 .getReference()
                                                 .child("UUID_APP")
@@ -1174,15 +1149,15 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                             }
                                         });
 
-                                        // ✅ Verificamos si también ha expirado adsFreeUntil
-                                        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                                        FirebaseDatabase.getInstance().getReference("REWARDS").child(uid).child("adsFreeUntil")
-                                                .get().addOnSuccessListener(snap -> {
-                                                    boolean mostrarAds = true;
-                                                    if (snap.exists()) {
-                                                        long until = snap.getValue(Long.class);
-                                                        mostrarAds = System.currentTimeMillis() > until;
-                                                    }
+                                            // ✅ Verificamos si también ha expirado adsFreeUntil
+                                            String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                                            FirebaseDatabase.getInstance().getReference("REWARDS").child(uid).child("adsFreeUntil")
+                                                    .get().addOnSuccessListener(snap -> {
+                                                        boolean mostrarAds = true;
+                                                        if (snap.exists()) {
+                                                            long until = snap.getValue(Long.class);
+                                                            mostrarAds = System.currentTimeMillis() > until;
+                                                        }
 
                                                     if (mostrarAds) {
                                                         SharedPreferences.Editor editor2 = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE).edit();
@@ -1196,7 +1171,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                                         });
                                                     }
                                                 });
-                                    }
+                                        }
 
                                 }
                             }
