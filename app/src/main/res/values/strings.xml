@@ -10,10 +10,10 @@
     <string name="canal_id">canal_basico</string>
     <string name="canal_id_descrip">Canal para usuarios activos</string>
     <string name="default_web_client_id">1066139154179-8gmpirfrrr6da7u9ufnei51ens3305qe.apps.googleusercontent.com</string>
-    <string name="admob_rewarded_id">ca-app-pub-3940256099942544/5224354917</string>
+    <string name="admob_rewarded_id">ca-app-pub-8581380224867392/9004583436</string>
     <!-- admob_rewarded_id ca-app-pub-8581380224867392/9004583436 -->
     <!-- admob_rewarded_prueba ca-app-pub-3940256099942544/5224354917 -->
-    <string name="admob_banner_id">ca-app-pub-3940256099942544/9214589741</string>
+    <string name="admob_banner_id">ca-app-pub-8581380224867392/9792180792</string>
     <!-- admob_banner_id ca-app-pub-8581380224867392/9792180792 -->
     <!-- admob_banner_prueba ca-app-pub-3940256099942544/9214589741 -->
 

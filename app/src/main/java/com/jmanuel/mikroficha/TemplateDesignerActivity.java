@@ -698,7 +698,8 @@ public class TemplateDesignerActivity extends AppCompatActivity {
 
     private void abrirGaleriaLogo() {
         try {
-            Intent intent = new Intent(Intent.ACTION_PICK);
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.setType("image/*");
             startActivityForResult(intent, REQUEST_SELECT_LOGO);
         } catch (Exception e) {
@@ -758,26 +759,57 @@ public class TemplateDesignerActivity extends AppCompatActivity {
     }
 
     private void doExportTemplate() {
+
+        // 1) Generamos los archivos HTML/CSS/… con las extensiones “png” por defecto
         Map<String, String> filesMap = TemplateGenerator.generateAllTemplates(currentTemplate);
-        // Si el usuario ha editado el HTML manualmente, procesamos la URI del logo
-        if (manualHtmlMode && editedHtml != null && !editedHtml.isEmpty()) {
-            String processedHtml = editedHtml
-                    .replaceAll("(<img\\s+[^>]*src=\")content://[^\"]+(\"[^>]*>)", "$1logo.png$2");
-            filesMap.put("login.html", processedHtml);
+
+        // 2) Averiguamos la EXTENSIÓN real de logo y fondo -------------------------
+        String logoExt = FilesManager.guessExtension(this, currentTemplate.getLogoUri());
+        String bgExt   = FilesManager.guessExtension(this, currentTemplate.getBackgroundImageUri());
+
+    /* -------------------------------------------------------------------------
+       3) Sustituimos logo.png  ->  logo.<ext>
+          y   background.png    ->  background.<ext>      en los textos generados
+    ------------------------------------------------------------------------- */
+        // -- login.html --
+        String html = filesMap.get("login.html");
+        if (html != null) {
+            html = html.replace("logo.png",       "logo." + logoExt)
+                    .replace("background.png", "background." + bgExt);
+            filesMap.put("login.html", html);
         }
 
-        boolean success = FilesManager.writeTemplateFiles(
-                this, filesMap,
+        // -- login.css (solo si el fondo es imagen) --
+        if ("IMAGE".equals(currentTemplate.getBackgroundType())) {
+            String css = filesMap.get("login.css");
+            if (css != null) {
+                css = css.replace("background.png", "background." + bgExt);
+                filesMap.put("login.css", css);
+            }
+        }
+
+        // 4) Si el usuario editó HTML a mano, repetimos el mismo reemplazo ----------
+        if (manualHtmlMode && editedHtml != null && !editedHtml.isEmpty()) {
+            String processed = editedHtml.replace("logo.png",       "logo." + logoExt)
+                    .replace("background.png", "background." + bgExt);
+            filesMap.put("login.html", processed);
+        }
+
+        // 5) Copiamos todo a Downloads/hotspot/  -----------------------------------
+        boolean ok = FilesManager.writeTemplateFiles(
+                this,
+                filesMap,
                 currentTemplate.getLogoUri(),
                 currentTemplate.getBackgroundImageUri()
-        );  // :contentReference[oaicite:0]{index=0}&#8203;:contentReference[oaicite:1]{index=1}
+        );
 
-        if (success) {
-            Toast.makeText(this, "Plantilla exportada exitosamente.", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(this, "Error al exportar la plantilla.", Toast.LENGTH_LONG).show();
-        }
+        Toast.makeText(this,
+                ok ? "Plantilla exportada exitosamente."
+                        : "Error al exportar la plantilla.",
+                Toast.LENGTH_LONG).show();
     }
+
+
 
     // Método para abrir la ventana modal de vista previa
     private void openPreviewModal() {
@@ -852,219 +884,112 @@ public class TemplateDesignerActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_SELECT_LOGO && resultCode == RESULT_OK && data != null) {
-            Uri logoUri = data.getData();
-            if (logoUri != null) {
-                // Mostrar indicador de carga
-                ProgressDialog progressDialog = new ProgressDialog(this);
-                progressDialog.setMessage("Verificando imagen...");
-                progressDialog.setCancelable(false);
-                progressDialog.show();
+        if (resultCode != RESULT_OK || data == null) return;
+        Uri uri = data.getData();
+        if (uri == null) return;
 
-                new Thread(() -> {
-                    boolean isValid = false;
-                    String errorMessage = "";
-
-                    try {
-                        Cursor cursor = getContentResolver().query(logoUri, null, null, null, null);
-                        if (cursor != null) {
-                            int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
-                            cursor.moveToFirst();
-
-                            // Verificar si existe la columna SIZE
-                            if (sizeIndex != -1) {
-                                long size = cursor.getLong(sizeIndex);
-                                cursor.close();
-
-                                if (size > MAX_LOGO_SIZE) {
-                                    errorMessage = "La imagen excede el límite de 300KB. Por favor, selecciona una imagen más pequeña.";
-                                } else {
-                                    isValid = true;
-                                }
-                            } else {
-                                cursor.close();
-                                // Alternativa: calcular tamaño leyendo bytes
-                                try {
-                                    InputStream inputStream = getContentResolver().openInputStream(logoUri);
-                                    if (inputStream != null) {
-                                        long size = 0;
-                                        byte[] buffer = new byte[8192];
-                                        int bytesRead;
-                                        while ((bytesRead = inputStream.read(buffer)) != -1) {
-                                            size += bytesRead;
-                                            if (size > MAX_LOGO_SIZE) break;
-                                        }
-                                        inputStream.close();
-
-                                        if (size > MAX_LOGO_SIZE) {
-                                            errorMessage = "La imagen excede el límite de 300KB. Por favor, selecciona una imagen más pequeña.";
-                                        } else {
-                                            isValid = true;
-                                        }
-                                    }
-                                } catch (Exception e) {
-                                    errorMessage = "No se pudo verificar el tamaño de la imagen: " + e.getMessage();
-                                    Log.e("TemplateDesigner", "Error al verificar tamaño de imagen", e);
-                                }
-                            }
-                        } else {
-                            errorMessage = "No se pudo obtener información de la imagen.";
-                        }
-                    } catch (Exception e) {
-                        errorMessage = "Error al procesar la imagen: " + e.getMessage();
-                        Log.e("TemplateDesigner", "Error al procesar imagen", e);
-                    }
-
-                    boolean finalIsValid = isValid;
-                    String finalErrorMessage = errorMessage;
-
-                    runOnUiThread(() -> {
-                        progressDialog.dismiss();
-
-                        if (finalIsValid) {
-                            // Guardar URI y actualizar UI
-                            currentTemplate.setLogoUri(logoUri.toString());
-                            logoPreview.setImageURI(logoUri);
-                            updatePreview();
-                            Toast.makeText(TemplateDesignerActivity.this, "Logo seleccionado correctamente", Toast.LENGTH_SHORT).show();
-                        } else {
-                            // Mostrar error
-                            new AlertDialog.Builder(TemplateDesignerActivity.this)
-                                    .setTitle("Error al seleccionar logo")
-                                    .setMessage(finalErrorMessage)
-                                    .setPositiveButton("Entendido", null)
-                                    .show();
-                        }
-                    });
-                }).start();
-            }
-        } else if (requestCode == REQUEST_PERMISSION_SETTINGS) {
-            // Verificar permisos después de volver de la configuración
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
-                        == PackageManager.PERMISSION_GRANTED) {
-                    abrirGaleriaLogo();
-                }
-            } else {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                        == PackageManager.PERMISSION_GRANTED) {
-                    abrirGaleriaLogo();
-                }
-            }
-        } else if (requestCode == REQUEST_SELECT_BACKGROUND_IMAGE && resultCode == RESULT_OK && data != null) {
-            Uri backgroundUri = data.getData();
-            if (backgroundUri != null) {
-                // Mostrar indicador de carga
-                ProgressDialog progressDialog = new ProgressDialog(this);
-                progressDialog.setMessage("Verificando imagen de fondo...");
-                progressDialog.setCancelable(false);
-                progressDialog.show();
-
-                new Thread(() -> {
-                    boolean isValid = false;
-                    String errorMessage = "";
-
-                    try {
-                        Cursor cursor = getContentResolver().query(backgroundUri, null, null, null, null);
-                        if (cursor != null) {
-                            int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
-                            cursor.moveToFirst();
-
-                            // Verificar si existe la columna SIZE
-                            if (sizeIndex != -1) {
-                                long size = cursor.getLong(sizeIndex);
-                                cursor.close();
-
-                                if (size > MAX_BACKGROUND_SIZE) {
-                                    errorMessage = "La imagen excede el límite de 500KB. Por favor, selecciona una imagen más pequeña.";
-                                } else {
-                                    isValid = true;
-                                }
-                            } else {
-                                cursor.close();
-                                // Alternativa: calcular tamaño leyendo bytes
-                                try {
-                                    InputStream inputStream = getContentResolver().openInputStream(backgroundUri);
-                                    if (inputStream != null) {
-                                        long size = 0;
-                                        byte[] buffer = new byte[8192];
-                                        int bytesRead;
-                                        while ((bytesRead = inputStream.read(buffer)) != -1) {
-                                            size += bytesRead;
-                                            if (size > MAX_BACKGROUND_SIZE) break;
-                                        }
-                                        inputStream.close();
-
-                                        if (size > MAX_BACKGROUND_SIZE) {
-                                            errorMessage = "La imagen excede el límite de 500KB. Por favor, selecciona una imagen más pequeña.";
-                                        } else {
-                                            isValid = true;
-                                        }
-                                    }
-                                } catch (Exception e) {
-                                    errorMessage = "No se pudo verificar el tamaño de la imagen: " + e.getMessage();
-                                    Log.e("TemplateDesigner", "Error al verificar tamaño de imagen", e);
-                                }
-                            }
-                        } else {
-                            errorMessage = "No se pudo obtener información de la imagen.";
-                        }
-                    } catch (Exception e) {
-                        errorMessage = "Error al procesar la imagen: " + e.getMessage();
-                        Log.e("TemplateDesigner", "Error al procesar imagen", e);
-                    }
-
-                    boolean finalIsValid = isValid;
-                    String finalErrorMessage = errorMessage;
-
-                    runOnUiThread(() -> {
-                        progressDialog.dismiss();
-
-                        if (finalIsValid) {
-                            // Guardar URI y actualizar UI
-                            currentTemplate.setBackgroundImageUri(backgroundUri.toString());
-                            currentTemplate.setBackgroundType("IMAGE");
-                            updatePreview();
-                            Toast.makeText(TemplateDesignerActivity.this, "Imagen de fondo seleccionada correctamente", Toast.LENGTH_SHORT).show();
-                        } else {
-                            // Mostrar error
-                            new AlertDialog.Builder(TemplateDesignerActivity.this)
-                                    .setTitle("Error al seleccionar imagen de fondo")
-                                    .setMessage(finalErrorMessage)
-                                    .setPositiveButton("Entendido", null)
-                                    .show();
-                        }
-                    });
-                }).start();
-            }
-        }else if (requestCode == REQUEST_PERMISSION_SETTINGS) {
-            // Verificar permisos después de volver de la configuración
-            boolean permisoOtorgado = false;
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                permisoOtorgado = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
-                        == PackageManager.PERMISSION_GRANTED);
-            } else {
-                permisoOtorgado = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                        == PackageManager.PERMISSION_GRANTED);
-            }
-
-            if (permisoOtorgado) {
-                // Intentar nuevamente la operación que requería permiso
-                // Aquí puedes mostrar un diálogo preguntando qué quiere hacer el usuario
-                new AlertDialog.Builder(this)
-                        .setTitle("Permiso concedido")
-                        .setMessage("¿Qué imagen deseas seleccionar ahora?")
-                        .setPositiveButton("Logo", (dialog, which) -> abrirGaleriaLogo())
-                        .setNegativeButton("Fondo", (dialog, which) -> abrirGaleriaFondo())
-                        .setNeutralButton("Cancelar", null)
-                        .show();
-            }
-        }else {
-            // Mantén el código existente para otros requestCode
-            // ...tu código actual para otros casos...
+        // Decide qué tipo de imagen y tamaño máximo
+        long maxSize;
+        String loadingMsg;
+        if (requestCode == REQUEST_SELECT_LOGO) {
+            maxSize = MAX_LOGO_SIZE;                  // 300 KB
+            loadingMsg = "Verificando logo...";
+        } else if (requestCode == REQUEST_SELECT_BACKGROUND_IMAGE) {
+            maxSize = MAX_BACKGROUND_SIZE;            // 500 KB
+            loadingMsg = "Verificando imagen de fondo...";
+        } else {
+            return; // no es nuestro caso
         }
+
+        // Mostrar diálogo de progreso
+        ProgressDialog progress = new ProgressDialog(this);
+        progress.setMessage(loadingMsg);
+        progress.setCancelable(false);
+        progress.show();
+
+        new Thread(() -> {
+            boolean isValid = false;
+            String error = null;
+            long size = -1;
+
+            // 1) Intentar obtener el tamaño desde OpenableColumns.SIZE
+            try (Cursor cursor = getContentResolver()
+                    .query(uri,
+                            new String[]{OpenableColumns.SIZE},
+                            null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int idx = cursor.getColumnIndex(OpenableColumns.SIZE);
+                    if (idx != -1) {
+                        size = cursor.getLong(idx);
+                    }
+                }
+            } catch (Exception e) {
+                // ignore — lo intentaremos leyendo bytes
+            }
+
+            // 2) Si no obtuvimos tamaño válido, leer bytes hasta el límite
+            if (size < 0) {
+                try (InputStream is = getContentResolver().openInputStream(uri)) {
+                    if (is != null) {
+                        byte[] buf = new byte[8192];
+                        int len;
+                        long acc = 0;
+                        while ((len = is.read(buf)) != -1) {
+                            acc += len;
+                            if (acc > maxSize) {
+                                size = acc;
+                                break;
+                            }
+                        }
+                        if (size < 0) size = acc;
+                    }
+                } catch (Exception e) {
+                    error = "No se pudo verificar el tamaño: " + e.getMessage();
+                }
+            }
+
+            // 3) Validar contra el máximo permitido
+            if (size >= 0) {
+                if (size <= maxSize) {
+                    isValid = true;
+                } else {
+                    String humanMax = (maxSize / 1024) + " KB";
+                    error = "El archivo pesa " + (size/1024) + " KB y supera el límite de " + humanMax + ".";
+                }
+            } else if (error == null) {
+                error = "No se pudo determinar el tamaño del archivo.";
+            }
+
+            boolean finalValid = isValid;
+            String finalError = error;
+
+            // 4) Volver al hilo UI
+            runOnUiThread(() -> {
+                progress.dismiss();
+                if (finalValid) {
+                    if (requestCode == REQUEST_SELECT_LOGO) {
+                        // Guardar logo
+                        currentTemplate.setLogoUri(uri.toString());
+                        logoPreview.setImageURI(uri);
+                        Toast.makeText(this, "Logo seleccionado correctamente", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Guardar fondo
+                        currentTemplate.setBackgroundImageUri(uri.toString());
+                        currentTemplate.setBackgroundType("IMAGE");
+                        Toast.makeText(this, "Imagen de fondo seleccionada correctamente", Toast.LENGTH_SHORT).show();
+                    }
+                    updatePreview();
+                } else {
+                    new AlertDialog.Builder(this)
+                            .setTitle("Error al seleccionar imagen")
+                            .setMessage(finalError)
+                            .setPositiveButton("Entendido", null)
+                            .show();
+                }
+            });
+        }).start();
     }
+
 
     // Método para actualizar la vista previa en el WebView
     private void updatePreview() {

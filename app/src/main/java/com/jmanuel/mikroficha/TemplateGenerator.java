@@ -1,5 +1,10 @@
 package com.jmanuel.mikroficha;
 
+import android.content.ContentResolver;
+import android.content.Context;
+import android.net.Uri;
+import android.webkit.MimeTypeMap;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,12 +15,14 @@ public class TemplateGenerator {
         // Genera el CSS actual
         String css = generateLoginCss(template, isExport);
 
-        // Si exportas, la imagen de logo será "logo.png"; si no, usamos la URI real
+        // Extrae la extensión y usa "logo.<ext>" al exportar
         String logoSource;
         if (template.getLogoUri().isEmpty()) {
             logoSource = "default_logo.png";
         } else {
-            logoSource = isExport ? "logo.png" : template.getLogoUri();
+            String logoExt = getExtensionFromUri(template.getLogoUri());
+            logoSource = isExport ? "logo." + logoExt          // ← aquí sí se añade .png, .jpg…
+                    : template.getLogoUri();      // ← preview: se usa la URI tal cual
         }
 
         // Construye el HTML con placeholders de MikroTik + tu plantilla
@@ -718,7 +725,14 @@ public class TemplateGenerator {
         css.append("body { ");
         if (template.getBackgroundType().equals("IMAGE") && !template.getBackgroundImageUri().isEmpty()) {
             // En exportación se usará "background.png"; en preview la URI real
-            String bgUrl = isExport ? "background.png" : template.getBackgroundImageUri();
+
+            // Extrae la extensión y usa "background.<ext>" al exportar
+            String bgExt = getExtensionFromUri(template.getBackgroundImageUri());
+            String bgUrl = isExport
+                    ? "background." + bgExt
+                    : template.getBackgroundImageUri();
+
+
             css.append("background: url('").append(bgUrl).append("') ")
                     .append(template.getBackgroundImageRepeat()).append(" ")
                     .append(template.getBackgroundImagePosition()).append("; ");
@@ -795,6 +809,33 @@ public class TemplateGenerator {
                 .append("}\n");
 
         return css.toString();
+    }
+
+    // Helper para extraer extensión de un URI (última parte después del '.')
+    // Requiere un Context para acceder al ContentResolver
+    public static String getExtensionFromUri(String uriString) {
+        // Primero, obtener solo el nombre del archivo (eliminar la ruta)
+        String fileName = uriString;
+        if (uriString.contains("/")) {
+            fileName = uriString.substring(uriString.lastIndexOf("/") + 1);
+        }
+
+        // Decodificar el nombre del archivo si contiene códigos URL
+        if (fileName.contains("%")) {
+            try {
+                fileName = java.net.URLDecoder.decode(fileName, "UTF-8");
+            } catch (Exception e) {
+                // Manejar excepción si ocurre
+            }
+        }
+
+        // Ahora buscar la extensión en el nombre limpio
+        int dot = fileName.lastIndexOf('.');
+        if (dot != -1 && dot < fileName.length() - 1) {
+            return fileName.substring(dot + 1).toLowerCase();
+        }
+
+        return "png";  // fallback
     }
 
 
