@@ -390,7 +390,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                             scf = false;
 
                         // Obtén el objeto SharedPreferences
-                        SharedPreferences sharedPreferences_dai = getSharedPreferences("MyAppPreferencesSubs", Context.MODE_PRIVATE);
+                        SharedPreferences sharedPreferences_dai = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
                         lastRunDate = sharedPreferences_dai.getString("lastRunDate", "");
                         lastRenewDate = sharedPreferences_dai.getString("lastRenewDate", "");
                         orderIDSub = sharedPreferences_dai.getString("orderIDSub", "");
@@ -873,7 +873,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                         SharedPreferences shared = getSharedPreferences("clave_uuid_app", Context.MODE_PRIVATE);
                                         SharedPreferences.Editor editora = shared.edit();
                                         editora.putBoolean("TIENE_SUBSCRIPCION", true);  // ✅ Añade esta línea
-
+                                        Log.d("testOffer", "tiene almenos una");
                                         editora.apply();
                                         ADMOB = false;
                                         //si tiene mas de una subscripcion verificar cual tiene
