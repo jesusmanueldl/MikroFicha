@@ -15,63 +15,83 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
+
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Properties;
 
 public class FilesManager {
 
+    /* TAG único para toda la clase */
+    private static final String TAG = "FilesManager";
+
     public static boolean writeTemplateFiles(Context context,
-                                             Map<String, String> filesMap,
+                                             Map<String,String> filesMap,
                                              String logoUri,
                                              String backgroundImageUri) {
+
         ContentResolver resolver = context.getContentResolver();
-        // Carpeta en Downloads/MikroFicha
         String relativePath = Environment.DIRECTORY_DOWNLOADS + "/hotspot/";
 
+        Log.d(TAG, "→ writeTemplateFiles() — total=" + filesMap.size());
+
         try {
-            // 1) Exportar HTML / CSS / etc.
-            for (Map.Entry<String, String> entry : filesMap.entrySet()) {
-                String filename = entry.getKey();              // e.g. "login.html"
-                String mime     = guessMimeType(filename);     // e.g. "text/html"
-                byte[] data     = entry.getValue().getBytes(StandardCharsets.UTF_8);
+            /* 1️⃣  Exportar HTML / CSS / JS … */
+            for (Map.Entry<String,String> entry : filesMap.entrySet()) {
+                String filename = entry.getKey();                    // ej. login.html
+                String mime     = guessMime(filename);               // ej. text/html
+                byte[] data     = entry.getValue()
+                        .getBytes(StandardCharsets.UTF_8);
+
+                Log.d(TAG, " · Grabando " + filename + " (" + mime + ")");
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    // --- Eliminar versión anterior si existe ---
+                    // ───── Android 10+ (MediaStore) ─────
                     String sel = MediaStore.Downloads.RELATIVE_PATH + "=? AND "
                             + MediaStore.Downloads.DISPLAY_NAME + "=?";
-                    String[] args = new String[]{ relativePath, filename };
-                    resolver.delete(MediaStore.Downloads.EXTERNAL_CONTENT_URI, sel, args);
+                    resolver.delete(MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                            sel, new String[]{relativePath, filename});
 
-                    // --- Insertar nueva versión con MediaStore ---
                     ContentValues cv = new ContentValues();
                     cv.put(MediaStore.Downloads.DISPLAY_NAME, filename);
-                    cv.put(MediaStore.Downloads.MIME_TYPE,       mime);
-                    cv.put(MediaStore.Downloads.RELATIVE_PATH,   relativePath);
+                    cv.put(MediaStore.Downloads.MIME_TYPE,    mime);
+                    cv.put(MediaStore.Downloads.RELATIVE_PATH,relativePath);
 
                     Uri fileUri = resolver.insert(
-                            MediaStore.Downloads.EXTERNAL_CONTENT_URI, cv
-                    );
+                            MediaStore.Downloads.EXTERNAL_CONTENT_URI, cv);
+
                     if (fileUri == null) {
-                        Log.e("FilesManager", "No se pudo crear URI para " + filename);
+                        Log.e(TAG, "‼️  No se pudo crear URI para " + filename);
                         return false;
                     }
                     try (OutputStream os = resolver.openOutputStream(fileUri)) {
                         os.write(data);
                     }
-                } else {
-                    // Fallback API <29: carpeta en app-private
-                    File exportDir = new File(
-                            context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),
-                            "hotspot"
-                    );
-                    if (!exportDir.exists() && !exportDir.mkdirs()) return false;
 
+                } else {
+                    // ───── API <29: carpeta privada de la app ─────
+                    File exportDir = new File(
+                            context.getExternalFilesDir(
+                                    Environment.DIRECTORY_DOWNLOADS),
+                            "hotspot");
+                    if (!exportDir.exists() && !exportDir.mkdirs()) {
+                        Log.e(TAG, "No se pudo crear " + exportDir.getAbsolutePath());
+                        return false;
+                    }
                     File dest = new File(exportDir, filename);
                     if (dest.exists()) dest.delete();
                     try (OutputStream os = new FileOutputStream(dest)) {
@@ -80,30 +100,30 @@ public class FilesManager {
                 }
             }
 
-            // 2) Copiar logo
+            /* 2️⃣ Copiar logo y fondo */
             if (!TextUtils.isEmpty(logoUri)) {
-                copyDocumentToDownloads(
-                        context,
-                        logoUri,
-                        "logo",
-                        relativePath
-                );
+                Log.d(TAG, " · Copiando logo (" + logoUri + ")");
+                copyDocumentToDownloads(context, logoUri, "logo", relativePath);
             }
-            // 3) Copiar fondo
             if (!TextUtils.isEmpty(backgroundImageUri)) {
-                copyDocumentToDownloads(
-                        context,
-                        backgroundImageUri,
-                        "background",
-                        relativePath
-                );
+                Log.d(TAG, " · Copiando fondo (" + backgroundImageUri + ")");
+                copyDocumentToDownloads(context, backgroundImageUri,
+                        "background", relativePath);
             }
 
+            Log.d(TAG, "✔️  Exportación completada OK");
             return true;
+
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "‼️  Error en writeTemplateFiles", e);
             return false;
         }
+    }
+
+    private static String guessMime(String filename){
+        String ext = MimeTypeMap.getFileExtensionFromUrl(filename);
+        String mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
+        return mime != null ? mime : "application/octet-stream";
     }
 
 
@@ -252,6 +272,87 @@ public class FilesManager {
 
         // 3. último recurso
         return "png";
+    }
+
+    /**
+     * Sube vía SFTP todos los archivos de la carpeta hotspot local al router MikroTik.
+     * @param host Dirección IP o hostname del router
+     * @param port Puerto SFTP (normalmente 22)
+     * @param username Usuario (ej. "admin")
+     * @param password Contraseña
+     * @param remoteDir Directorio remoto dentro de RouterOS (ej. "hotspot/temply-template")
+     * @param context Contexto de la app para localizar la carpeta Downloads/hotspot
+     * @return true si la transferencia fue exitosa
+     */
+    public static boolean uploadTemplateFTP(
+            String host,
+            int port,
+            String username,
+            String password,
+            String remoteDir,
+            Context context
+    ) {
+        // 1️⃣ Carpeta privada (API <29)
+        File localDir = new File(
+                context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),
+                "hotspot");
+
+        // 2️⃣ Si no existe, prueba con la carpeta pública (API 29+)
+        if (!localDir.exists()) {
+            localDir = new File(
+                    Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_DOWNLOADS),
+                    "hotspot");
+        }
+        if (!localDir.exists() || !localDir.isDirectory()) {
+            Log.e("FilesManager","Directorio local no existe: "+localDir.getAbsolutePath());
+            return false;
+        }
+
+        if (!localDir.exists() || !localDir.isDirectory()) {
+            Log.e("FilesManager", "Directorio local no existe: " + localDir);
+            return false;
+        }
+
+        FTPClient ftp = new FTPClient();
+        try {
+            ftp.connect(host, port);
+            if (!ftp.login(username, password)) {
+                ftp.logout();
+                return false;
+            }
+            ftp.enterLocalPassiveMode();
+            ftp.setFileType(FTP.BINARY_FILE_TYPE);
+
+            // Asegúrate de estar en el directorio remoto
+            if (!ftp.changeWorkingDirectory(remoteDir)) {
+                // si no existe, créalo y luego posiciónate
+                ftp.makeDirectory(remoteDir);
+                ftp.changeWorkingDirectory(remoteDir);
+            }
+
+            // Sube todos los archivos de la carpeta hotspot
+            for (File f : localDir.listFiles()) {
+                if (f.isFile()) {
+                    try (InputStream is = new FileInputStream(f)) {
+                        if (!ftp.storeFile(f.getName(), is)) {
+                            Log.e("FilesManager", "Error subiendo " + f.getName());
+                            // continúas o return false según tu criterio
+                        }
+                    }
+                }
+            }
+
+            ftp.logout();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (ftp.isConnected()) ftp.disconnect();
+            } catch (IOException ignored) {}
+        }
     }
 
 

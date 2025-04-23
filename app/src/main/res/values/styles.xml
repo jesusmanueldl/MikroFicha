@@ -9,4 +9,22 @@
         <item name="android:windowCloseOnTouchOutside">true</item>
     </style>
 
+    <!--  Estilo base para todos los Spinner de tu app  -->
+    <style name="Widget.App.Spinner" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <!-- Altura mínima para que se vea cómodo -->
+        <item name="android:minHeight">48dp</item>
+
+        <!-- Fuente por defecto de tu app -->
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Body1</item>
+
+        <!-- Color del texto  -->
+        <item name="android:textColor">@color/primary_dark</item>
+
+        <!-- Color del icono desplegable (flecha) en Material 3 -->
+        <item name="android:tint">@color/primary_dark</item>
+
+        <!-- Borde y relleno si usas un Spinner “clásico” -->
+
+    </style>
+
 </resources>

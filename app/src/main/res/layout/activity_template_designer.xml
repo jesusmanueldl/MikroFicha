@@ -546,9 +546,7 @@
 permite guardar el diseño generado en tu dispositivo en el directorio de
 Descargas, dentro se crea un directorio de nombre hotspot. Este
 directorio contiene todos los archivo necesario para que MikroTik lo
-utilice como plantilla de hotspot. Importante: ⚠️ Actualmente no está habilitada la opción de subir la
-plantilla directamente desde la app, por lo que debes usar Winbox para
-hacerlo."></TextView>
+utilice como plantilla de hotspot."></TextView>
 
                 <TextView
                     android:id="@+id/textViewPdfLink"

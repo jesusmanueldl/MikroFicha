@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
@@ -51,11 +52,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import me.legrange.mikrotik.ApiConnection;
 import yuku.ambilwarna.AmbilWarnaDialog;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 import java.util.Map;
 import android.Manifest;
+
+import javax.net.SocketFactory;
 
 public class TemplateDesignerActivity extends AppCompatActivity {
 
@@ -647,12 +657,149 @@ public class TemplateDesignerActivity extends AppCompatActivity {
         });
 
         // Botón para exportar la plantilla
+        //exportButton.setOnClickListener(v -> {
+        //    doExportTemplate();
+        //});
+
+        // en onCreate, después de exportButton:
         exportButton.setOnClickListener(v -> {
-            doExportTemplate();
+            if (doExportTemplate()) {         // ← devuelve boolean
+                openRouterSelector();       // muestra el modal de routers
+            }
         });
 
         // Inicializar la vista previa con los valores por defecto
         updatePreview();
+    }
+
+    // ---------- dentro de TemplateDesignerActivity ----------
+    private void openRouterSelector() {
+
+        View view = getLayoutInflater()
+                .inflate(R.layout.dialog_select_router, null);
+
+        Spinner spRouters   = view.findViewById(R.id.spinnerNeighbors);
+        EditText edtUser    = view.findViewById(R.id.editUser);
+        EditText edtPass    = view.findViewById(R.id.editPass);
+        EditText edtRemote  = view.findViewById(R.id.editRemoteDir);
+        Button   btnUpload  = view.findViewById(R.id.btnUpload);
+
+        ArrayAdapter<String> neighborAdapter =
+                new ArrayAdapter<>(this,
+                        android.R.layout.simple_spinner_item,
+                        new ArrayList<>());
+        neighborAdapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
+        // ← placeholder fijo
+        neighborAdapter.add("Selecciona un router…");   // ← placeholder fijo
+        spRouters.setAdapter(neighborAdapter);
+        spRouters.setSelection(0, false);
+
+        /* 3️⃣  Listener: habilita solo si la posición > 0 */
+        spRouters.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                btnUpload.setEnabled(pos > 0);          // true solo si eligió un router real
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) { btnUpload.setEnabled(false); }
+        });
+
+        AlertDialog dlg = new AlertDialog.Builder(this)
+                .setTitle("Enviar plantilla al Router")
+                .setView(view)
+                .setNegativeButton("Cancelar", null)
+                .setPositiveButton("Nueva búsqueda", null)    // ← NUEVO
+                .create();
+        dlg.show();
+
+        ProgressDialog pd = new ProgressDialog(this);
+        pd.setMessage("Buscando routers…");
+        pd.setCancelable(false);            // evita cerrar antes de tiempo
+
+        /* función para descubrir */
+        Runnable runDiscovery = () -> {
+            /* limpia todo menos el placeholder */
+            while (neighborAdapter.getCount() > 1) neighborAdapter.remove(neighborAdapter.getItem(1));
+            btnUpload.setEnabled(false);
+            new TaskDiscoverNeighbors(neighborAdapter, pd).execute();
+        };
+        runDiscovery.run();                                 // primera vez
+
+        /* ✅ Interceptamos el botón POSITIVE para que NO cierre el diálogo */
+        dlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> runDiscovery.run());
+
+        /* 2️⃣  Cuando el usuario pulse “Conectar y subir” */
+        btnUpload.setOnClickListener(b -> {
+            String selected = (String) spRouters.getSelectedItem(); // "IP (MAC)"
+            if (selected == null) { Toast.makeText(this,"Sin routers",Toast.LENGTH_SHORT).show(); return; }
+
+            String host = selected.split(" ")[1];                  // solo la IP
+            int    port = 21;                                      // FTP; cámbialo si usas SFTP
+            String user = edtUser.getText().toString().trim();
+            String pass = edtPass.getText().toString().trim();
+            String dir  = edtRemote.getText().toString().trim();
+
+            new TaskUploadTemplate(host,port,user,pass,dir).execute();
+            dlg.dismiss();
+        });
+    }
+
+    /* ---------- AsyncTask para descubrir routers ---------- */
+    private static class TaskDiscoverNeighbors extends AsyncTask<Void, String, Void> {
+
+        private final ArrayAdapter<String> adapter;
+        private static final String TAG = "DISCOVER_MT";
+        private final ProgressDialog pd;
+
+        TaskDiscoverNeighbors(ArrayAdapter<String> adapter, ProgressDialog pd) { this.adapter = adapter; this.pd = pd; }
+
+        @Override protected void onPreExecute() {            // ① se muestra
+            super.onPreExecute();
+            if (pd != null && !pd.isShowing()) pd.show();
+        }
+
+        @Override protected Void doInBackground(Void... p){
+            try(DatagramSocket sock = new DatagramSocket(5678)){
+                sock.setBroadcast(true);
+                sock.setSoTimeout(6000);
+                byte[] req = {(byte)0xFF,(byte)0xFF};
+                DatagramPacket pkt = new DatagramPacket(req,req.length,
+                        InetAddress.getByName("192.168.88.255"),5678);
+
+                for(int i=0;i<3 && !isCancelled();i++){
+                    sock.send(pkt);                                     // broadcast
+                    while(true){
+                        try{
+                            DatagramPacket resp = new DatagramPacket(new byte[240],240);
+                            sock.receive(resp);
+
+                            byte[] buf = resp.getData();
+                            String ip  = resp.getAddress().getHostAddress();
+                            String mac = String.format("%02X:%02X:%02X:%02X:%02X:%02X",
+                                    buf[4],buf[5],buf[6],buf[7],buf[8],buf[9]);
+
+                            /* --------- leer System-Identity --------- */
+                            int start = 18;                              // 4 ID +1 ver +6 MAC +4 IP +3 pad
+                            int end   = start;
+                            while(end < resp.getLength() && buf[end] != 0) end++;
+                            String id = new String(buf,start,end-start,"UTF-8").trim();
+
+                            publishProgress(id + " " + ip); // 👈
+                        }catch(SocketTimeoutException e){ break; }
+                    }
+                }
+            }catch(IOException e){ Log.e(TAG,"MNDP error",e); }
+            return null;
+        }
+
+        @Override protected void onProgressUpdate(String... values) {
+            adapter.add(values[0]); adapter.notifyDataSetChanged();
+        }
+        @Override protected void onPostExecute(Void r) {     // ② se oculta
+            super.onPostExecute(r);
+            if (pd != null && pd.isShowing()) pd.dismiss();
+        }
+
+
     }
 
     private void selectBackgroundImage() {
@@ -689,30 +836,21 @@ public class TemplateDesignerActivity extends AppCompatActivity {
         } else {
             // Ya tiene permiso
             if (requestCode == REQUEST_SELECT_LOGO) {
-                abrirGaleriaLogo();
+                abrirGaleriaImagen(REQUEST_SELECT_LOGO);
             } else if (requestCode == REQUEST_SELECT_BACKGROUND_IMAGE) {
-                abrirGaleriaFondo();
+                abrirGaleriaImagen(REQUEST_SELECT_BACKGROUND_IMAGE);
             }
         }
     }
 
-    private void abrirGaleriaLogo() {
+    private void abrirGaleriaImagen(int requestCode) {
         try {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.setType("image/*");
-            startActivityForResult(intent, REQUEST_SELECT_LOGO);
-        } catch (Exception e) {
-            Toast.makeText(this, "No se pudo abrir la galería: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            Log.e("TemplateDesigner", "Error al abrir galería", e);
-        }
-    }
-
-    private void abrirGaleriaFondo() {
-        try {
-            Intent intent = new Intent(Intent.ACTION_PICK);
-            intent.setType("image/*");
-            startActivityForResult(intent, REQUEST_SELECT_BACKGROUND_IMAGE);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                    Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+            startActivityForResult(intent, requestCode);
         } catch (Exception e) {
             Toast.makeText(this, "No se pudo abrir la galería: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             Log.e("TemplateDesigner", "Error al abrir galería", e);
@@ -725,9 +863,9 @@ public class TemplateDesignerActivity extends AppCompatActivity {
         if (requestCode == REQUEST_SELECT_LOGO || requestCode == REQUEST_SELECT_BACKGROUND_IMAGE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if (requestCode == REQUEST_SELECT_LOGO) {
-                    abrirGaleriaLogo();
+                    abrirGaleriaImagen(REQUEST_SELECT_LOGO);
                 } else {
-                    abrirGaleriaFondo();
+                    abrirGaleriaImagen(REQUEST_SELECT_BACKGROUND_IMAGE);
                 }
             } else {
                 boolean showRationale = false;
@@ -758,56 +896,75 @@ public class TemplateDesignerActivity extends AppCompatActivity {
         }
     }
 
-    private void doExportTemplate() {
+    private boolean doExportTemplate() {
 
-        // 1) Generamos los archivos HTML/CSS/… con las extensiones “png” por defecto
-        Map<String, String> filesMap = TemplateGenerator.generateAllTemplates(currentTemplate);
+        final String TAG = "EXPORT";
 
-        // 2) Averiguamos la EXTENSIÓN real de logo y fondo -------------------------
-        String logoExt = FilesManager.guessExtension(this, currentTemplate.getLogoUri());
-        String bgExt   = FilesManager.guessExtension(this, currentTemplate.getBackgroundImageUri());
+        try {
+            Log.d(TAG, "⇢ Iniciando exportación…");
 
-    /* -------------------------------------------------------------------------
-       3) Sustituimos logo.png  ->  logo.<ext>
-          y   background.png    ->  background.<ext>      en los textos generados
-    ------------------------------------------------------------------------- */
-        // -- login.html --
-        String html = filesMap.get("login.html");
-        if (html != null) {
-            html = html.replace("logo.png",       "logo." + logoExt)
-                    .replace("background.png", "background." + bgExt);
-            filesMap.put("login.html", html);
-        }
+            /* 1️⃣  Generar archivos base */
+            Map<String, String> filesMap =
+                    TemplateGenerator.generateAllTemplates(currentTemplate);
+            Log.d(TAG, " · Archivos generados: " + filesMap.keySet());
 
-        // -- login.css (solo si el fondo es imagen) --
-        if ("IMAGE".equals(currentTemplate.getBackgroundType())) {
-            String css = filesMap.get("login.css");
-            if (css != null) {
-                css = css.replace("background.png", "background." + bgExt);
-                filesMap.put("login.css", css);
+            /* 2️⃣  Extensiones reales */
+            String logoExt = FilesManager.guessExtension(this, currentTemplate.getLogoUri());
+            String bgExt   = FilesManager.guessExtension(this, currentTemplate.getBackgroundImageUri());
+            Log.d(TAG, " · Ext logo: " + logoExt + "  · Ext fondo: " + bgExt);
+
+            /* 3️⃣  Reemplazos en login.html / css */
+            String html = filesMap.get("login.html");
+            if (html != null) {
+                html = html.replace("logo.png", "logo." + logoExt)
+                        .replace("background.png", "background." + bgExt);
+                filesMap.put("login.html", html);
+                Log.d(TAG, " · login.html modificado");
             }
+
+            if ("IMAGE".equals(currentTemplate.getBackgroundType())) {
+                String css = filesMap.get("login.css");
+                if (css != null) {
+                    css = css.replace("background.png", "background." + bgExt);
+                    filesMap.put("login.css", css);
+                    Log.d(TAG, " · login.css modificado");
+                }
+            }
+
+            /* 4️⃣  HTML manual */
+            if (manualHtmlMode && editedHtml != null && !editedHtml.isEmpty()) {
+                String processed = editedHtml.replace("logo.png", "logo." + logoExt)
+                        .replace("background.png", "background." + bgExt);
+                filesMap.put("login.html", processed);
+                Log.d(TAG, " · HTML editado sobrescrito");
+            }
+
+            /* 5️⃣  Copiar a Downloads/hotspot/ */
+            boolean ok = FilesManager.writeTemplateFiles(
+                    this,
+                    filesMap,
+                    currentTemplate.getLogoUri(),
+                    currentTemplate.getBackgroundImageUri()
+            );
+            Log.d(TAG, " · writeTemplateFiles devuelve: " + ok);
+
+            Toast.makeText(this,
+                    ok ? "Plantilla exportada exitosamente."
+                            : "Error al exportar la plantilla.",
+                    Toast.LENGTH_LONG).show();
+
+            Log.d(TAG, "⇠ Exportación terminada");
+            return ok;
+
+        } catch (Exception e) {
+            Log.e("EXPORT", "‼️ Error inesperado en exportación", e);
+            Toast.makeText(this,
+                    "Error al exportar la plantilla: " + e.getMessage(),
+                    Toast.LENGTH_LONG).show();
+            return false;
         }
-
-        // 4) Si el usuario editó HTML a mano, repetimos el mismo reemplazo ----------
-        if (manualHtmlMode && editedHtml != null && !editedHtml.isEmpty()) {
-            String processed = editedHtml.replace("logo.png",       "logo." + logoExt)
-                    .replace("background.png", "background." + bgExt);
-            filesMap.put("login.html", processed);
-        }
-
-        // 5) Copiamos todo a Downloads/hotspot/  -----------------------------------
-        boolean ok = FilesManager.writeTemplateFiles(
-                this,
-                filesMap,
-                currentTemplate.getLogoUri(),
-                currentTemplate.getBackgroundImageUri()
-        );
-
-        Toast.makeText(this,
-                ok ? "Plantilla exportada exitosamente."
-                        : "Error al exportar la plantilla.",
-                Toast.LENGTH_LONG).show();
     }
+
 
 
 
@@ -887,6 +1044,13 @@ public class TemplateDesignerActivity extends AppCompatActivity {
         if (resultCode != RESULT_OK || data == null) return;
         Uri uri = data.getData();
         if (uri == null) return;
+
+        /* ---------- PERMISO PERSISTENTE ---------- */
+        final int takeFlags = data.getFlags() & Intent.FLAG_GRANT_READ_URI_PERMISSION;
+        try {                                             // NEW
+            getContentResolver().takePersistableUriPermission(uri, takeFlags); // NEW
+        } catch (SecurityException ignore) { }            // NEW
+        /* ----------------------------------------- */
 
         // Decide qué tipo de imagen y tamaño máximo
         long maxSize;
@@ -1022,7 +1186,7 @@ public class TemplateDesignerActivity extends AppCompatActivity {
 
 
     // Método para exportar la plantilla generando los archivos y guardándolos en disco
-    private void exportTemplate() {
+    private void exportTemplaxte() {
         Map<String, String> filesMap = TemplateGenerator.generateAllTemplates(currentTemplate);
         boolean success = FilesManager.writeTemplateFiles(this, filesMap, currentTemplate.getLogoUri(), currentTemplate.getBackgroundImageUri());
         if (success) {
@@ -1057,4 +1221,35 @@ public class TemplateDesignerActivity extends AppCompatActivity {
         startActivity(new Intent(TemplateDesignerActivity.this, MainActivity.class));
         finish();
     }
+
+    /* ---------- AsyncTask subida (igual al de antes) ---------- */
+    private class TaskUploadTemplate extends AsyncTask<Void,Void,Boolean>{
+        String h;int p;String u,pa,d;ProgressDialog pg;
+        TaskUploadTemplate(String h,int p,String u,String pa,String d){
+            this.h=h;this.p=p;this.u=u;this.pa=pa;this.d=d;
+        }
+        @Override protected void onPreExecute(){
+            /* 1️⃣  Muestra todo lo que va a usarse en la conexión */
+            Log.d("UPLOAD", "=== Parámetros FTP ===");
+            Log.d("UPLOAD", "Host : " + h);
+            Log.d("UPLOAD", "Puerto: " + p);
+            Log.d("UPLOAD", "Usuario: " + u);
+            Log.d("UPLOAD", "Pass  : " + (pa.isEmpty() ? "<vacío>" : "******"));
+            Log.d("UPLOAD", "Direct: " + d);
+            Log.d("UPLOAD", "=======================");
+            pg = ProgressDialog.show(TemplateDesignerActivity.this,
+                    "Temply","Subiendo archivos…",true,false);
+        }
+        @Override protected Boolean doInBackground(Void... v){
+            return FilesManager.uploadTemplateFTP(
+                    h,p,u,pa,d,TemplateDesignerActivity.this);
+        }
+        @Override protected void onPostExecute(Boolean ok){
+            pg.dismiss();
+            Toast.makeText(TemplateDesignerActivity.this,
+                    ok?"Plantilla subida al Router ✅":"Error al subir ❌",Toast.LENGTH_LONG).show();
+        }
+    }
+
+
 }

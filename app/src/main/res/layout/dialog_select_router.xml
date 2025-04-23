@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ejemplo para el contenedor raíz -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Spinner con ancho completo -->
+    <Spinner
+        android:id="@+id/spinnerNeighbors"
+        android:layout_width="match_parent"
+        android:layout_height="39dp" />
+
+    <!-- Usuario -->
+<EditText
+android:id="@+id/editUser"
+android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:hint="Usuario"/>
+
+    <!-- Contraseña -->
+<EditText
+android:id="@+id/editPass"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:hint="Contraseña"
+android:inputType="textPassword"/>
+
+    <!-- Directorio remoto -->
+<EditText
+android:id="@+id/editRemoteDir"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:hint="hotspot/"/>
+
+    <!-- Botón -->
+<Button
+android:id="@+id/btnUpload"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:text="Conectar y subir"/>
+    </LinearLayout>
