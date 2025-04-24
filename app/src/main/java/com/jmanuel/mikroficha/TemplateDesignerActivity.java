@@ -818,6 +818,7 @@ public class TemplateDesignerActivity extends AppCompatActivity {
         }
     }
     private void checkAndRequestPermission(String permission, int requestCode) {
+        SharedPreferences prefs = getSharedPreferences("permissions", MODE_PRIVATE);
         if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
             // Verifica si debemos mostrar explicación
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
@@ -825,12 +826,15 @@ public class TemplateDesignerActivity extends AppCompatActivity {
                         .setTitle("Permiso necesario")
                         .setMessage("Para seleccionar un logo, necesitamos acceso a tus imágenes.")
                         .setPositiveButton("Conceder", (dialog, which) -> {
+                            prefs.edit().putBoolean("asked_permission", true).apply(); // Marcar como ya solicitado
                             ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
                         })
                         .setNegativeButton("Cancelar", null)
                         .show();
             } else {
                 // Primera vez o el usuario marcó "No volver a preguntar"
+                // Primera vez o ya marcó "no volver a preguntar"
+                prefs.edit().putBoolean("asked_permission", true).apply(); // Marcar como ya solicitado
                 ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
             }
         } else {
@@ -868,14 +872,15 @@ public class TemplateDesignerActivity extends AppCompatActivity {
                     abrirGaleriaImagen(REQUEST_SELECT_BACKGROUND_IMAGE);
                 }
             } else {
-                boolean showRationale = false;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    showRationale = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_MEDIA_IMAGES);
-                } else {
-                    showRationale = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-                }
 
-                if (!showRationale) {
+                SharedPreferences prefs = getSharedPreferences("permissions", MODE_PRIVATE);
+                boolean askedBefore = prefs.getBoolean("asked_permission", false);
+
+                boolean showRationale = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                        ? ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_MEDIA_IMAGES)
+                        : ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+
+                if (!showRationale && askedBefore) {
                     // Usuario marcó "No volver a preguntar"
                     new AlertDialog.Builder(this)
                             .setTitle("Permiso denegado")
@@ -966,8 +971,6 @@ public class TemplateDesignerActivity extends AppCompatActivity {
     }
 
 
-
-
     // Método para abrir la ventana modal de vista previa
     private void openPreviewModal() {
         // Infla el layout del diálogo
@@ -1028,18 +1031,28 @@ public class TemplateDesignerActivity extends AppCompatActivity {
     }
 
 
-    // Método para actualizar la vista previa usando el HTML editado
-    private void updatePreviewWithEditedHtml() {
-        if (!editedHtml.isEmpty()){
-            previewWebView.clearCache(true);
-            previewWebView.loadDataWithBaseURL(null, editedHtml, "text/html", "UTF-8", null);
-        }
-    }
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_PERMISSION_SETTINGS) {
+            // Verificar si ya tiene el permiso al volver de ajustes
+            boolean hasPermission;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                hasPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
+            } else {
+                hasPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+            }
+
+            if (hasPermission) {
+                // Permiso restaurado, limpiamos el flag
+                getSharedPreferences("permissions", MODE_PRIVATE)
+                        .edit()
+                        .remove("asked_permission")
+                        .apply();
+            }
+            return;
+        }
 
         if (resultCode != RESULT_OK || data == null) return;
         Uri uri = data.getData();
@@ -1182,18 +1195,6 @@ public class TemplateDesignerActivity extends AppCompatActivity {
         updated = updated.replaceAll("(?i)(#box\\s*\\{[^}]*height:\\s*)([^;]+)(;)",
                 "$1" + currentTemplate.getFormHeight() + "px$3");
         return updated;
-    }
-
-
-    // Método para exportar la plantilla generando los archivos y guardándolos en disco
-    private void exportTemplaxte() {
-        Map<String, String> filesMap = TemplateGenerator.generateAllTemplates(currentTemplate);
-        boolean success = FilesManager.writeTemplateFiles(this, filesMap, currentTemplate.getLogoUri(), currentTemplate.getBackgroundImageUri());
-        if (success) {
-            Toast.makeText(this, "Plantilla exportada exitosamente en la carpeta de descargas.", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(this, "Error al exportar la plantilla.", Toast.LENGTH_LONG).show();
-        }
     }
 
     // Implementación del selector de color usando AmbilWarnaDialog
