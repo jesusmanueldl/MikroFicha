@@ -449,10 +449,6 @@ public class Router extends AppCompatActivity implements PopupMenu.OnMenuItemCli
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
             // La aplicación tiene el permiso ACCESS_COARSE_LOCATION
             // Aquí puedes realizar las operaciones que requieren el permiso, como escanear redes Wi-Fi
-            //Log.d("Wifix","hoola");
-            //TaskUsuarioSSH conectar = new TaskUsuarioSSH("192.168.1.69","admin","477426997Aa");
-            //conectar.execute();
-
         } else {
             // La aplicación no tiene el permiso ACCESS_COARSE_LOCATION
             // Aquí puedes solicitar el permiso al usuario utilizando el método requestPermissions()
@@ -649,100 +645,5 @@ public class Router extends AppCompatActivity implements PopupMenu.OnMenuItemCli
                 exito = true;
         }
     }
-
-    class TaskUsuarioSSH extends AsyncTask<String, String, List<String>>{
-
-        private String mHost;
-        private String mUsername;
-        private String mPasssword;
-
-        public TaskUsuarioSSH(String mHost, String mUsername, String mPasssword) {
-            this.mHost = mHost;
-            this.mUsername = mUsername;
-            this.mPasssword = mPasssword;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected List<String> doInBackground(String... strings) {
-           // MikrotikSSHClient client = new MikrotikSSHClient("192.168.1.69",22, "admin", "477426997Aa");
-            //List<String> result = null;
-
-           /* try {
-                client.connect();
-                if(client.getConnectionStatus().success){
-                    result = client.executeCommand("/ip hotspot user profile print");
-                    client.disconnect();
-                   // Log.d("Wifix",result.toString());
-                    if (result != null) {
-                        for (String row : result) {
-                            //String[] columns = row.split("\\s+");
-                            //Log.d("Wifix:",row);
-                        }
-                    }
-
-                }
-                else{
-                    Log.d("Wifix", client.getConnectionStatus().errorMessage);
-                }
-
-            } catch (JSchException | IOException e) {
-                Log.d("Wifix", e.getMessage());
-            }*/
-/*
-
-            try {
-                SSLContext sslContext = SSLContext.getInstance("TLS");
-                KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                trustStore.load(null,null);
-                TrustManagerFactory trustManagerFactory= TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-                trustManagerFactory.init(trustStore);
-                sslContext.init(null, trustManagerFactory.getTrustManagers(),null);
-                SSLSocketFactory socketFactory= sslContext.getSocketFactory();
-
-                ApiConnection con = ApiConnection.connect(socketFactory,"192.168.1.69", ApiConnection.DEFAULT_TLS_PORT,
-                        ApiConnection.DEFAULT_CONNECTION_TIMEOUT); // connect to router
-                con.login("admin", "477426997Aa"); // log in to router
-
-                if (con.isConnected()) {
-                    List<Map<String, String>> rs = con.execute("/system/routerboard/print");
-                    con.close();
-                    for (Map<String,String> r : rs) {
-                        Log.d("Wifix",r.get("serial-number").toString());
-                    }
-                }else{
-                    Log.d("Wifix","no");
-                }
-
-            } catch (MikrotikApiException e) {
-                Log.d("Wifix",e.getMessage());
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (KeyStoreException e) {
-                e.printStackTrace();
-            } catch (CertificateException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (KeyManagementException e) {
-                e.printStackTrace();
-            }
-*/
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(List<String> strings) {
-            super.onPostExecute(strings);
-        }
-
-
-    }
-
-
 
 }
