@@ -6,8 +6,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.view.WindowCompat;
@@ -15,8 +13,6 @@ import androidx.core.view.WindowCompat;
 import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -614,7 +610,7 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
 
         });
         */
-        crearNotificacionCanal(); //notificaciones
+        NotificationHelper.crearCanal(this); //notificaciones
         numeroFichas(); //limites de ficha actualizado desde inter quitar para publcar
 
         // taskrouter.execute();
@@ -1293,7 +1289,7 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
         }
 
         if (enReposo) { //si esta en reposo amos leer el router
-            crearNotificacionCanal(); //notificaciones
+            NotificationHelper.crearCanal(this); //notificaciones
             numeroFichas(); //limites de ficha actualizado desde inter quitar para publcar
             if (ADMOB)
                 adview.resume();
@@ -1313,45 +1309,6 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
         taskrouter.cancel(true);
     }
 
-    private void generarNotificacion() {
-        String canalId = getString(R.string.canal_id);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(Admin.this, canalId)
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setContentTitle("Nueva ficha activada")
-                .setContentText("Nuevo usuario conectado")
-                .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText("Nuevo usuario conectado"))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(Admin.this);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        notificationManager.notify(0, builder.build());
-
-    }
-
-    private void crearNotificacionCanal(){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            String name = getString(R.string.nombre_canal);
-            String canalId = getString(R.string.canal_id);
-            String descricion = getString(R.string.canal_id_descrip);
-            int importancia = NotificationManager.IMPORTANCE_DEFAULT;
-
-            NotificationChannel canal = new NotificationChannel(canalId, name,importancia);
-            canal.setDescription(descricion);
-
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(canal);
-        }
-    }
 
     public void numeroFichas(){
         long interval = 3600;
@@ -1950,7 +1907,7 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
 
                 if(total_activo_control > total_activo && mas_una) { //notificacion de usuario nuevo
                     total_activo = total_activo_control;
-                    generarNotificacion();
+                    NotificationHelper.notificarNuevaFicha(Admin.this);
                 }
                 else if(total_activo > total_activo_control)
                     total_activo = total_activo_control;
