@@ -13,3 +13,13 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Build artifacts - no versionar AABs/APKs, se distribuyen via Play Console
+app/release/*.aab
+app/release/*.apk
+app/release/*.zip
+
+# Estado local de IDE no compartido por el equipo
+/.idea/AndroidProjectSystem.xml
+/.idea/appInsightsSettings.xml
+/.idea/runConfigurations.xml
