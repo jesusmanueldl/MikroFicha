@@ -1,5 +1,6 @@
 package com.jmanuel.mikroficha;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -153,7 +154,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
         //
         // setContentView(R.layout.activity_main);
         setContentView(R.layout.activity_main_new);

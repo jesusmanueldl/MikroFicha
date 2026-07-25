@@ -1,5 +1,6 @@
 package com.jmanuel.mikroficha;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -9,6 +10,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.core.view.WindowCompat;
 
 import android.Manifest;
 import android.app.Activity;
@@ -230,6 +232,7 @@ public class Admin extends AppCompatActivity implements PopupMenu.OnMenuItemClic
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
 
