@@ -19,3 +19,15 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# --- Gson ---
+# Estas clases se serializan/deserializan por nombre de campo via reflexion
+# (SharedPreferences y respuesta de Retrofit), sin @SerializedName, asi que
+# los nombres de campo deben sobrevivir la ofuscacion tal cual.
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class com.jmanuel.mikroficha.RoutersMk { <fields>; }
+-keep class com.jmanuel.mikroficha.BtData { <fields>; }
+-keep class com.jmanuel.mikroficha.SubscriptionDetails { <fields>; }
+-keep,allowobfuscation,allowshrinking class com.google.gson.reflect.TypeToken
+-keep,allowobfuscation,allowshrinking class * extends com.google.gson.reflect.TypeToken
